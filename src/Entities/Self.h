@@ -1,0 +1,31 @@
+#pragma once
+
+#include "Player.h"
+#include "Networking/Client.h"
+#include "Networking/Server.h"
+
+class Self : public Player
+{
+public:
+	Self();
+	~Self();
+
+	virtual void OnUpdate(float deltaTime) override;
+	virtual void OnEvent(const sf::Event& event) override;
+
+	void BecomeServer(const std::string& serverName);
+	void BecomeClient();
+
+	Client* GetClient();
+	Server* GetServer();
+
+private:
+	void HandleConnection();
+
+private:
+	float m_Speed;
+	Networker* m_Networker;
+
+	std::vector<Player*> m_OtherPlayers;
+	std::vector<uint64_t> m_JoinedUUIDs;
+};

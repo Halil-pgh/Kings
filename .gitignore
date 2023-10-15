@@ -1,0 +1,6 @@
+# build folders
+cmake-build-debug/
+cmake-build-release/
+
+# Clion
+.idea/
