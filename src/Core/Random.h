@@ -7,10 +7,16 @@ public:
     static void Init();
 
     template<typename T>
-    static T GenerateInt(T min, T max);
+    static T GenerateInt(T min, T max) {
+        std::uniform_int_distribution<T> dist(min, max);
+        return dist(m_RandomEngine);
+    }
 
     template<typename T>
-    static T GenerateReal(T min, T max);
+    static T GenerateReal(T min, T max) {
+        std::uniform_real_distribution<T> dist(min, max);
+        return dist(m_RandomEngine);
+    }
 
 private:
     Random() = default;
