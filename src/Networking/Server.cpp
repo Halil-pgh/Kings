@@ -2,6 +2,7 @@
 #include "Server.h"
 
 #include <cassert>
+#include <utility>
 #include "Data/Types.h"
 #include "Data/Connections.h"
 #include "Data/ServerData.h"
@@ -12,8 +13,8 @@ struct ClientData
 	unsigned short port;
 };
 
-Server::Server(const std::string& name)
-	: m_Name(name)
+Server::Server(std::string name)
+	: m_Name(std::move(name))
 {
 	m_Data.uuid = GenerateUUID();
 
@@ -38,7 +39,7 @@ void Server::Run()
 {
 	m_Thread = std::thread([&]() {
 
-		// Warning: clients and m_Players are needs to synced!
+		// Warning: clients and m_Players are needs to sync!
 		std::vector<ClientData> clients;
 		sf::IpAddress clientIp;
 		unsigned short clientPort;
@@ -50,7 +51,7 @@ void Server::Run()
 			{
 				unsigned int typeInt;
 				packet >> typeInt;
-				DataTypes type = (DataTypes)typeInt;
+				auto type = (DataTypes)typeInt;
 
 				if (type == DataTypes::ConnectionRequest)
 				{
@@ -68,7 +69,7 @@ void Server::Run()
 					packet << (unsigned int)DataTypes::ConnectionAccept;
 					ConnectionAccept accept = {
 						m_Name,
-						m_Players.size()
+                        (unsigned int)m_Players.size()
 					};
 					packet << accept;
 
@@ -91,7 +92,7 @@ void Server::Run()
 				{
 					ConnectionAvailable conn = {
 						m_Name,
-						m_Players.size()
+                        (unsigned int)m_Players.size()
 					};
 
 					packet.clear();

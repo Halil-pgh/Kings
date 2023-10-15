@@ -90,8 +90,8 @@ bool TextInput::isMouseOn()
 {
 	const sf::WindowBase& windowBase = Application::Get()->GetWindowBase();
 
-	return sf::Mouse::getPosition(windowBase).x > m_Rect.getPosition().x &&
-		sf::Mouse::getPosition(windowBase).x < m_Rect.getPosition().x + m_Rect.getSize().x &&
-		sf::Mouse::getPosition(windowBase).y > m_Rect.getPosition().y &&
-		sf::Mouse::getPosition(windowBase).y < m_Rect.getPosition().y + m_Rect.getSize().y;
+	return (float)sf::Mouse::getPosition(windowBase).x > m_Rect.getPosition().x &&
+            (float)sf::Mouse::getPosition(windowBase).x < m_Rect.getPosition().x + m_Rect.getSize().x &&
+            (float)sf::Mouse::getPosition(windowBase).y > m_Rect.getPosition().y &&
+            (float)sf::Mouse::getPosition(windowBase).y < m_Rect.getPosition().y + m_Rect.getSize().y;
 }

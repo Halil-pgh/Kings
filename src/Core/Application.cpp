@@ -8,6 +8,7 @@
 #include "UI/ServerList.h"
 #include "UI/TextInput.h"
 #include "SceneManager.h"
+#include "Random.h"
 
 Application* Application::s_Instance = nullptr;
 
@@ -15,6 +16,7 @@ Application::Application()
 {
 	m_Window.create(sf::VideoMode(1024, 640), "Game");
 	m_Camera = m_Window.getDefaultView();
+    Random::Init();
 	SceneManager::Init();
 	FontManager::SetFont("assets/fonts/arial.ttf");
 }
@@ -26,11 +28,11 @@ Application::~Application()
 
 void Application::Run()
 {
-	Self* self = new Self();
-	TextInput* textInput = new TextInput(GetWindowBase().getSize().x / 3, 150, GetWindowBase().getSize().x / 3, 50, "Enter your name");
-	ServerList* serverList = new ServerList();
+	auto self = new Self();
+	auto textInput = new TextInput((float)GetWindowBase().getSize().x / 3, 150, (float)GetWindowBase().getSize().x / 3, 50, "Enter your name");
+	auto serverList = new ServerList();
 
-	Button* createButton = new Button(GetWindowBase().getSize().x / 6, 400, 200, 50, "Create Game");
+	auto createButton = new Button((float)GetWindowBase().getSize().x / 6, 400, 200, 50, "Create Game");
 	createButton->SetOnClickCallback([&]() {
 		if (textInput->Get().empty())
 			return;
@@ -40,7 +42,7 @@ void Application::Run()
 		SceneManager::SetActiveScene("Game");
 	});
 
-	Button* joinButton = new Button(7 * GetWindowBase().getSize().x / 12, 400, 200, 50, "Join Game");
+	auto joinButton = new Button((float)7 * (float)GetWindowBase().getSize().x / 12, 400, 200, 50, "Join Game");
 	joinButton->SetOnClickCallback([&]() {
 		if (textInput->Get().empty())
 			return;
@@ -52,22 +54,22 @@ void Application::Run()
 		SceneManager::SetActiveScene("Server List");
 	});
 
-	Scene* gameScene = new Scene("Game");
+	auto gameScene = new Scene("Game");
 	gameScene->AddEntity(self);
 
-	Scene* mainScene = new Scene("Main");
+    auto mainScene = new Scene("Main");
 	mainScene->AddEntity(textInput);
 	mainScene->AddEntity(createButton);
 	mainScene->AddEntity(joinButton);
 
-	Scene* serverListScene = new Scene("Server List");
+    auto serverListScene = new Scene("Server List");
 	serverListScene->AddEntity(serverList);
 
 	SceneManager::AddScene(mainScene);
 	SceneManager::AddScene(gameScene);
 	SceneManager::AddScene(serverListScene);
 
-	sf::Event event;
+	sf::Event event{};
 	sf::Clock clock;
 	while (m_Running)
 	{

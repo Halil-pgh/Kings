@@ -16,7 +16,7 @@ Button::Button(float x, float y, float width, float height, const std::string& m
 
 	m_Text.setFont(FontManager::GetFont());
 	// TODO: use m_Text.getLocalBounds().width | height
-	m_Text.setPosition(x + width / 2 - mess.length() * CHAR_WIDTH, y + height / 2 - CHAR_HEIGHT);
+	m_Text.setPosition(x + width / 2 - (float)mess.length() * CHAR_WIDTH, y + height / 2 - CHAR_HEIGHT);
 	m_Text.setString(mess);
 	m_Text.setCharacterSize(18);
 	m_Text.setFillColor(sf::Color::Black);
@@ -77,6 +77,8 @@ void Button::OnEvent(const sf::Event& event)
 			}
 			break;
 		}
+        default:
+            break;
 	}
 }
 
@@ -84,8 +86,8 @@ bool Button::isMouseOn()
 {
 	const sf::WindowBase& windowBase = Application::Get()->GetWindowBase();
 
-	return sf::Mouse::getPosition(windowBase).x > m_Rect.getPosition().x &&
-		sf::Mouse::getPosition(windowBase).x < m_Rect.getPosition().x + m_Rect.getSize().x &&
-		sf::Mouse::getPosition(windowBase).y > m_Rect.getPosition().y &&
-		sf::Mouse::getPosition(windowBase).y < m_Rect.getPosition().y + m_Rect.getSize().y;
+	return (float)sf::Mouse::getPosition(windowBase).x > m_Rect.getPosition().x &&
+            (float)sf::Mouse::getPosition(windowBase).x < m_Rect.getPosition().x + m_Rect.getSize().x &&
+            (float)sf::Mouse::getPosition(windowBase).y > m_Rect.getPosition().y &&
+            (float)sf::Mouse::getPosition(windowBase).y < m_Rect.getPosition().y + m_Rect.getSize().y;
 }

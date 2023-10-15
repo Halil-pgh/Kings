@@ -19,14 +19,14 @@ class Client : public Networker
 {
 public:
 	Client();
-	~Client();
+	~Client() override;
 
-	virtual void Run() override;
-	virtual void ShoutDown() override { m_Thread.join(); }
+	void Run() override;
+	void ShoutDown() override { m_Thread.join(); }
 
-	virtual inline const std::vector<PlayerData>& GetPlayers() const override { return m_Players; }
-	virtual inline void SetPlayerData(const PlayerData& data) override { m_Data = data; }
-	virtual inline uint64_t GetUUID() override { return m_Data.uuid; }
+	inline const std::vector<PlayerData>& GetPlayers() const override { return m_Players; }
+	inline void SetPlayerData(const PlayerData& data) override { m_Data = data; }
+	inline uint64_t GetUUID() override { return m_Data.uuid; }
 
 	void RefreshServers();
 	void JoinServer(const ServerInfo& server);

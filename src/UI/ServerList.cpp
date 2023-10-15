@@ -4,7 +4,7 @@
 #include "Core/Application.h"
 #include "Core/SceneManager.h"
 
-#define WINDOW_SIZE Application::Get()->GetWindowBase().getSize()
+#define WINDOW_SIZE (float)Application::Get()->GetWindowBase().getSize()
 #define ROWS 5
 #define COLUMNS 3
 #define LIST_PADDING 20
@@ -59,7 +59,7 @@ void ServerList::OnUpdate(float deltaTime)
 		if (!here)
 		{
 			m_ServerInfos.push_back(m_Client->m_ServerInfos[i]);
-			float fi = (float)i;
+			auto fi = (float)i;
 			Button button = {
 				(float)WINDOW_SIZE.x / 4, LIST_PADDING + fi * (LIST_PADDING + SERVER_CART_HEIGHT),
 				(float)WINDOW_SIZE.x / 2, SERVER_CART_HEIGHT, "Name: " + m_Client->m_ServerInfos[i].name + ", Player Count: " + std::to_string(m_Client->m_ServerInfos[i].playerCount)

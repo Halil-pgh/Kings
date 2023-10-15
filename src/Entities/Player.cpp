@@ -2,6 +2,7 @@
 #include "Player.h"
 
 #include "UI/FontManager.h"
+#include "Core/Random.h"
 
 #define TEXT_POS_X (m_Rect.getPosition().x - m_Text.getLocalBounds().width / 2)
 #define TEXT_POS_Y (m_Rect.getPosition().y - (m_Rect.getSize().y / 2) - m_Text.getLocalBounds().height * 1.5)
@@ -9,12 +10,10 @@
 Player::Player()
 	: m_Velocity(0, 0)
 {
-	srand(time(NULL));
-
 	m_Rect.setPosition(100, 100);
 	m_Rect.setSize({ 50, 50 });
 	m_Rect.setOrigin(m_Rect.getSize().x / 2, m_Rect.getSize().y / 2);
-	m_Rect.setFillColor(sf::Color(rand() % 256, rand() % 256, rand() % 256));
+	m_Rect.setFillColor(sf::Color(Random::GenerateInt(0, 256), Random::GenerateInt(0, 256), Random::GenerateInt(0, 256)));
 
 	m_Text.setFont(FontManager::GetFont());
 	m_Text.setString("None");

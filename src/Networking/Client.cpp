@@ -28,7 +28,6 @@ Client::~Client()
 void Client::Run()
 {
     m_Thread = std::thread([&]() {
-        std::string serverName;
         sf::IpAddress serverIp;
         unsigned short serverPort;
 
@@ -44,7 +43,7 @@ void Client::Run()
                 {
                     unsigned int typeInt;
                     packet >> typeInt;
-                    DataTypes type = (DataTypes)typeInt;
+                    auto type = (DataTypes)typeInt;
                     if (type == DataTypes::ConnectionAccept)
                     {
                         std::cout << "Connected to server " << serverIp << ":" << serverPort << "\n";
@@ -52,7 +51,6 @@ void Client::Run()
                         m_Connected = true;
                         ConnectionAccept accept;
                         packet >> accept;
-                        serverName = accept.serverName;
                     }
                     else if (type == DataTypes::ConnectionAvailable)
                     {
@@ -83,7 +81,7 @@ void Client::Run()
             {
                 unsigned int typeInt;
                 packet >> typeInt;
-                DataTypes type = (DataTypes)typeInt;
+                auto type = (DataTypes)typeInt;
                 if (type == DataTypes::ServerData)
                 {
                     ServerData serverData;
@@ -108,7 +106,7 @@ void Client::RefreshServers()
     packet << m_Data;
     if (m_Socket.send(packet, sf::IpAddress::Broadcast, Server::PORT) != sf::Socket::Done)
     {
-        std::cout << "Failed to brodcast connection available request!\n";
+        std::cout << "Failed to broadcast connection available request!\n";
         assert(false);
     }
 }

@@ -17,7 +17,9 @@ file(GLOB_RECURSE SRC_FILES
         src/*.h
 )
 
-add_executable(Trial ${SRC_FILES})
+add_executable(Trial ${SRC_FILES}
+        src/Core/Random.cpp
+        src/Core/Random.h)
 target_include_directories(Trial PRIVATE src)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)

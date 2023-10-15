@@ -5,7 +5,7 @@
 class Scene
 {
 public:
-	Scene(const std::string& name);
+	Scene(std::string  name);
 	~Scene();
 
 	inline const std::string& GetName() const { return m_Name; }

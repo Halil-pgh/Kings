@@ -12,9 +12,9 @@ public:
 	void SetBackScene(const std::string& name);
 	void SetClient(Client* client);
 
-	virtual void OnUpdate(float deltaTime) override;
-	virtual void OnDraw(sf::RenderWindow& window) override;
-	virtual void OnEvent(const sf::Event& event) override;
+	void OnUpdate(float deltaTime) override;
+	void OnDraw(sf::RenderWindow& window) override;
+	void OnEvent(const sf::Event& event) override;
 
 private:
 	Button m_BackButton;

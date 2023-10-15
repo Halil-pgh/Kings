@@ -7,11 +7,11 @@ class Player : public Entity
 {
 public:
 	Player();
-	virtual ~Player() = default;
+	~Player() override = default;
 
-	virtual void OnUpdate(float deltaTime) {};
-	virtual void OnDraw(sf::RenderWindow& window) override;
-	virtual void OnEvent(const sf::Event& event) {};
+	void OnUpdate(float deltaTime) override {};
+	void OnDraw(sf::RenderWindow& window) override;
+	void OnEvent(const sf::Event& event) override {};
 
 	void SetName(const std::string& name);
 	void Reload(const PlayerData& data);

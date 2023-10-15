@@ -1,8 +1,10 @@
 #include "pch.h"
 #include "Scene.h"
 
-Scene::Scene(const std::string& name)
-	: m_Name(name)
+#include <utility>
+
+Scene::Scene(std::string name)
+	: m_Name(std::move(name))
 {
 }
 
@@ -22,7 +24,7 @@ void Scene::RemoveEntity(Entity* entity)
 	auto it = std::find(m_Entites.begin(), m_Entites.end(), entity);
 	if (it == m_Entites.end())
 	{
-		std::cout << "Entity couldnt found: " << entity << "\n";
+		std::cout << "Entity couldn't found: " << entity << "\n";
 		return;
 	}
 	m_Entites.erase(it);

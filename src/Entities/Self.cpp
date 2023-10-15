@@ -13,8 +13,7 @@ Self::Self()
 
 Self::~Self()
 {
-	if (m_Networker)
-		delete m_Networker;
+    delete m_Networker;
 }
 
 void Self::OnUpdate(float deltaTime)
@@ -24,13 +23,13 @@ void Self::OnUpdate(float deltaTime)
 	Application::Get()->GetCamera().setCenter(m_Rect.getPosition() + sf::Vector2f{m_Rect.getSize().x / 2, m_Rect.getSize().y / 2});
 
 	sf::Vector2i mousePos = sf::Mouse::getPosition(Application::Get()->GetWindowBase());
-	float xdiff = mousePos.x - m_Rect.getPosition().x;
-	float ydiff = mousePos.y - m_Rect.getPosition().y;
+	float xdiff = (float)mousePos.x - m_Rect.getPosition().x;
+	float ydiff = (float)mousePos.y - m_Rect.getPosition().y;
 	float radian = atan2f(ydiff, xdiff);
-	static const double myPi = 3.14159265359;
+	static const float myPi = 3.14159265359;
 	m_Rect.setRotation(radian * (180.0f / myPi));
 
-	float line = sqrt(pow(xdiff, 2) + pow(ydiff, 2));
+	auto line = (float)sqrt(pow(xdiff, 2) + pow(ydiff, 2));
 	float times = line / m_Speed;
 	if (times != 0.0f)
 	{
@@ -115,7 +114,7 @@ void Self::HandleConnection()
 		if (already)
 			continue;
 
-		Player* newPlayer = new Player();
+		auto newPlayer = new Player();
 		newPlayer->Reload(player);
 
 		SceneManager::GetActiveScene()->AddEntity(newPlayer);

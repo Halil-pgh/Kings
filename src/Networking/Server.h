@@ -6,15 +6,15 @@
 class Server : public Networker
 {
 public:
-	Server(const std::string& name);
-	~Server();
+	explicit Server(std::string name);
+	~Server() override;
 
-	virtual void Run() override;
-	virtual void ShoutDown() override { m_Thread.join(); }
+	void Run() override;
+	void ShoutDown() override { m_Thread.join(); }
 
-	virtual inline const std::vector<PlayerData>& GetPlayers() const override { return m_Players; }
-	virtual inline void SetPlayerData(const PlayerData& data) override { m_Data = data; m_Players[0] = data; }
-	virtual inline uint64_t GetUUID() override { return m_Data.uuid; }
+	inline const std::vector<PlayerData>& GetPlayers() const override { return m_Players; }
+	inline void SetPlayerData(const PlayerData& data) override { m_Data = data; m_Players[0] = data; }
+	inline uint64_t GetUUID() override { return m_Data.uuid; }
 
 public:
 	static const unsigned int PORT = 5000;

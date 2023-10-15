@@ -17,7 +17,7 @@ void SceneManager::Destroy()
 
 void SceneManager::AddScene(const std::string& name)
 {
-	Scene* scene = new Scene(name);
+	auto scene = new Scene(name);
 
 	if (m_ActiveScene == nullptr)
 		m_ActiveScene = scene;
@@ -67,7 +67,7 @@ void SceneManager::RemoveScene(const std::string& name)
 Scene* SceneManager::GetActiveScene()
 {
 	if (m_ActiveScene == nullptr)
-		std::cout << "Warning: You are trying to get a null active sceen!\n";
+		std::cout << "Warning: You are trying to get a null active scene!\n";
 	return m_ActiveScene;
 }
 

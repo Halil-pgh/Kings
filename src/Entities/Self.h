@@ -8,10 +8,10 @@ class Self : public Player
 {
 public:
 	Self();
-	~Self();
+	~Self() override;
 
-	virtual void OnUpdate(float deltaTime) override;
-	virtual void OnEvent(const sf::Event& event) override;
+	void OnUpdate(float deltaTime) override;
+	void OnEvent(const sf::Event& event) override;
 
 	void BecomeServer(const std::string& serverName);
 	void BecomeClient();
