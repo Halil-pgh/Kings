@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.26)
-project(Trial)
+project(Kings)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -17,12 +17,11 @@ file(GLOB_RECURSE SRC_FILES
         src/*.h
 )
 
-add_executable(Trial ${SRC_FILES})
-target_include_directories(Trial PRIVATE src)
+add_executable(Kings ${SRC_FILES})
+target_include_directories(Kings PRIVATE src)
 
-option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
-target_compile_definitions(Trial PRIVATE SFML_STATIC)
-target_link_libraries(Trial PRIVATE
+target_compile_definitions(Kings PUBLIC SFML_STATIC)
+target_link_libraries(Kings PRIVATE
         sfml-graphics
         sfml-window
         sfml-system
@@ -30,4 +29,4 @@ target_link_libraries(Trial PRIVATE
         sfml-network
 )
 
-target_precompile_headers(Trial PRIVATE src/pch.h)
+target_precompile_headers(Kings PRIVATE src/pch.h)
