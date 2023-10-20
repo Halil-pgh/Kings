@@ -19,6 +19,7 @@ public:
 	Server* GetServer();
 
 private:
+    void FollowMouse();
 	void HandleConnection();
 
 private:

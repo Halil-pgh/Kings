@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <utility>
+#include "Core/Application.h"
 #include "Data/Types.h"
 #include "Data/Connections.h"
 #include "Data/ServerData.h"
@@ -39,7 +40,7 @@ void Server::Run() {
 		sf::IpAddress clientIp;
 		unsigned short clientPort;
 
-		while (true) {
+		while (Application::Get()->IsRunning()) {
 			sf::Packet packet;
 			if (m_Socket.receive(packet, clientIp, clientPort) != sf::Socket::NotReady) {
 				unsigned int typeInt;

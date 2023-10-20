@@ -9,6 +9,7 @@ public:
 	void Run();
 
 	inline const sf::WindowBase& GetWindowBase() const { return m_Window; }
+    inline bool IsRunning() const { return m_Running; }
 	inline sf::View& GetCamera() { return m_Camera; }
 
 private:

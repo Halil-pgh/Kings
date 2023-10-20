@@ -26,8 +26,8 @@ ServerList::ServerList()
 
 void ServerList::SetBackScene(const std::string& name) {
 	m_BackButton.SetOnClickCallback([&]() {
-		m_Client->ShoutDown();
-		SceneManager::SetActiveScene(name);
+        SceneManager::SetActiveScene(name);
+        m_Client->ShoutDown();
 	});
 }
 
@@ -72,8 +72,7 @@ void ServerList::OnUpdate(float deltaTime) {
 		button.OnUpdate(deltaTime);
 }
 
-void ServerList::OnDraw(sf::RenderWindow& window)
-{
+void ServerList::OnDraw(sf::RenderWindow& window) {
 	m_BackButton.OnDraw(window);
 	m_RefreshButton.OnDraw(window);
 	m_JoinButton.OnDraw(window);
@@ -82,8 +81,7 @@ void ServerList::OnDraw(sf::RenderWindow& window)
 		button.OnDraw(window);
 }
 
-void ServerList::OnEvent(const sf::Event& event)
-{
+void ServerList::OnEvent(const sf::Event& event) {
 	m_BackButton.OnEvent(event);
 	m_RefreshButton.OnEvent(event);
 	m_JoinButton.OnEvent(event);

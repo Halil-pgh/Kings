@@ -8,6 +8,7 @@
 #include <memory>
 #include <thread>
 #include <utility>
+#include <numbers>
 
 #include <sstream>
 #include <string>

@@ -2,6 +2,7 @@
 #include "Client.h"
 
 #include <cassert>
+#include "Core/Application.h"
 #include "Data/Types.h"
 #include "Data/Connections.h"
 #include "Data/ServerData.h"
@@ -30,7 +31,7 @@ void Client::Run() {
         sf::IpAddress receivedIP;
         unsigned short receivedPort;
 
-        while (true) {
+        while (Application::Get()->IsRunning()) {
             sf::Packet packet;
             if (!m_Connected){
                 if (m_Socket.receive(packet, serverIp, serverPort) != sf::Socket::NotReady) {

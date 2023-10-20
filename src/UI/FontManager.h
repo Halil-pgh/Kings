@@ -3,8 +3,7 @@
 #include <SFML/Graphics/Font.hpp>
 #include <iostream>
 
-class FontManager
-{
+class FontManager {
 public:
 	static void SetFont(const std::string& fileName) {
 		if (!s_Font.loadFromFile(fileName)) {
