@@ -4,8 +4,7 @@
 #include "Networking/Client.h"
 #include "Networking/Server.h"
 
-class Self : public Player
-{
+class Self : public Player {
 public:
 	Self();
 	~Self() override;

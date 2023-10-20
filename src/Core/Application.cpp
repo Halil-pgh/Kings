@@ -12,8 +12,7 @@
 
 Application* Application::s_Instance = nullptr;
 
-Application::Application()
-{
+Application::Application() {
 	m_Window.create(sf::VideoMode(1024, 640), "Game");
 	m_Camera = m_Window.getDefaultView();
     Random::Init();
@@ -21,13 +20,11 @@ Application::Application()
 	FontManager::SetFont("assets/fonts/arial.ttf");
 }
 
-Application::~Application()
-{
+Application::~Application() {
 	SceneManager::Destroy();
 }
 
-void Application::Run()
-{
+void Application::Run() {
 	auto self = new Self();
 	auto textInput = new TextInput((float)GetWindowBase().getSize().x / 3, 150, (float)GetWindowBase().getSize().x / 3, 50, "Enter your name");
 	auto serverList = new ServerList();
@@ -71,8 +68,7 @@ void Application::Run()
 
 	sf::Event event{};
 	sf::Clock clock;
-	while (m_Running)
-	{
+	while (m_Running) {
 		m_Window.setView(m_Camera);
 		SceneManager::GetActiveScene()->OnUpdate(clock.restart().asSeconds());
 
@@ -80,10 +76,8 @@ void Application::Run()
 		SceneManager::GetActiveScene()->OnDraw(m_Window);
 		m_Window.display();
 
-		while (m_Window.pollEvent(event))
-		{
-			if (event.type == sf::Event::Closed)
-			{
+		while (m_Window.pollEvent(event)) {
+			if (event.type == sf::Event::Closed) {
 				m_Window.close();
 				m_Running = false;
 			}
@@ -93,14 +87,12 @@ void Application::Run()
 	}
 }
 
-Application* Application::Get()
-{
+Application* Application::Get() {
 	if (s_Instance == nullptr)
 		s_Instance = new Application();
 	return s_Instance;
 }
 
-void Application::Destroy()
-{
+void Application::Destroy() {
 	delete s_Instance;
 }

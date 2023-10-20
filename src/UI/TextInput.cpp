@@ -11,8 +11,7 @@
 #define CURSOR_POS_X (MID_POS_X + m_Text.getLocalBounds().width / 2)
 #define CURSOR_POS_Y (MID_POS_Y - m_Text.getLocalBounds().height / 2)
 
-TextInput::TextInput(float x, float y, float width, float height, const std::string& defaultText)
-{
+TextInput::TextInput(float x, float y, float width, float height, const std::string& defaultText) {
 	m_Rect.setPosition(x, y);
 	m_Rect.setSize({ width, height });
 	m_Rect.setFillColor(sf::Color::White);
@@ -35,17 +34,14 @@ TextInput::TextInput(float x, float y, float width, float height, const std::str
 	m_DefaultText.setStyle(sf::Text::Italic);
 }
 
-void TextInput::OnUpdate(float deltaTime)
-{
-	if (m_Clock.getElapsedTime().asSeconds() > m_BlinkingSeconds)
-	{
+void TextInput::OnUpdate(float deltaTime) {
+	if (m_Clock.getElapsedTime().asSeconds() > m_BlinkingSeconds) {
 		m_IsBlinking = !m_IsBlinking;
 		m_Clock.restart();
 	}
 }
 
-void TextInput::OnDraw(sf::RenderWindow& window)
-{
+void TextInput::OnDraw(sf::RenderWindow& window) {
 	window.draw(m_Rect);
 	window.draw(m_Text);
 
@@ -56,25 +52,19 @@ void TextInput::OnDraw(sf::RenderWindow& window)
 		window.draw(m_DefaultText);
 }
 
-void TextInput::OnEvent(const sf::Event& event)
-{
-	if (m_TakeInput)
-	{
-		if (event.type == sf::Event::TextEntered)
-		{
+void TextInput::OnEvent(const sf::Event& event) {
+	if (m_TakeInput) {
+		if (event.type == sf::Event::TextEntered) {
 			// Backspace (i couldnt found a const for backspace unicode)
-			if (event.text.unicode == 8)
-			{
-				if (!m_Input.empty())
-				{
+			if (event.text.unicode == 8) {
+				if (!m_Input.empty()) {
 					m_Input.pop_back();
 					m_Text.setString(m_Input);
 					m_Text.setPosition(TEXT_POS_X(m_Text), TEXT_POS_Y(m_Text));
 					m_Cursor.setPosition(CURSOR_POS_X, CURSOR_POS_Y);
 				}
 			}
-			else if (event.text.unicode < 128)
-			{
+			else if (event.text.unicode < 128) {
 				m_Input += (char)(event.text.unicode);
 				m_Text.setString(m_Input);
 				m_Text.setPosition(TEXT_POS_X(m_Text), TEXT_POS_Y(m_Text));

@@ -6,8 +6,7 @@
 #include <SFML/System/Vector2.hpp>
 
 template<typename T>
-inline sf::Packet& operator<<(sf::Packet& packet, const std::vector<T>& vector)
-{
+inline sf::Packet& operator<<(sf::Packet& packet, const std::vector<T>& vector) {
 	packet << static_cast<uint32_t>(vector.size());
 	for (const T& t : vector)
 		packet << t;
@@ -15,14 +14,12 @@ inline sf::Packet& operator<<(sf::Packet& packet, const std::vector<T>& vector)
 }
 
 template<typename T>
-inline sf::Packet& operator>>(sf::Packet& packet, std::vector<T>& vector)
-{
+inline sf::Packet& operator>>(sf::Packet& packet, std::vector<T>& vector) {
 	uint32_t size;
 	packet >> size;
 	vector.clear();
 	vector.reserve(size);
-	for (uint32_t i = 0; i < size; i++)
-	{
+	for (uint32_t i = 0; i < size; i++) {
 		T t;
 		packet >> t;
 		vector.push_back(t);
@@ -30,22 +27,18 @@ inline sf::Packet& operator>>(sf::Packet& packet, std::vector<T>& vector)
 	return packet;
 }
 
-inline sf::Packet& operator<<(sf::Packet& packet, const sf::Color& color)
-{
+inline sf::Packet& operator<<(sf::Packet& packet, const sf::Color& color) {
 	return packet << color.r << color.g << color.b << color.a;
 }
 
-inline sf::Packet& operator>>(sf::Packet& packet, sf::Color& color)
-{
+inline sf::Packet& operator>>(sf::Packet& packet, sf::Color& color) {
 	return packet >> color.r >> color.g >> color.b >> color.a;
 }
 
-inline sf::Packet& operator<<(sf::Packet& packet, const sf::Vector2f& vec)
-{
+inline sf::Packet& operator<<(sf::Packet& packet, const sf::Vector2f& vec) {
 	return packet << vec.x << vec.y;
 }
 
-inline sf::Packet& operator>>(sf::Packet& packet, sf::Vector2f& vec)
-{
+inline sf::Packet& operator>>(sf::Packet& packet, sf::Vector2f& vec) {
 	return packet >> vec.x >> vec.y;
 }

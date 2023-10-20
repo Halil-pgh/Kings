@@ -2,21 +2,18 @@
 
 #include "Networker.h"
 
-struct ServerInfo
-{
+struct ServerInfo {
 	sf::IpAddress ip;
 	unsigned short port;
 	std::string name;
 	unsigned int playerCount;
 
-	bool operator==(const ServerInfo& other) const
-	{
+	bool operator==(const ServerInfo& other) const {
 		return other.ip == ip && other.port == port;
 	}
 };
 
-class Client : public Networker
-{
+class Client : public Networker {
 public:
 	Client();
 	~Client() override;

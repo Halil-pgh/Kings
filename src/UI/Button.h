@@ -2,8 +2,7 @@
 
 #include "Entities/Entity.h"
 
-class Button : public Entity
-{
+class Button : public Entity {
 public:
 	Button(float x, float y, float width, float height, const std::string& mess);
 

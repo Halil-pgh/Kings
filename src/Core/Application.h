@@ -2,8 +2,7 @@
 
 #include "Scene.h"
 
-class Application
-{
+class Application {
 public:
 	static Application* Get();
 	static void Destroy();

@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "Self.h"
 
+#include "Entities/Buildings/Home.h"
+#include "Entities/Buildings/Mine.h"
 #include "Networking/Server.h"
 #include "Networking/Client.h"
 #include "Core/SceneManager.h"
@@ -42,6 +44,29 @@ void Self::OnUpdate(float deltaTime)
 
 void Self::OnEvent(const sf::Event& event)
 {
+    switch (event.type) {
+        case sf::Event::KeyPressed: {
+            switch (event.key.code) {
+                case sf::Keyboard::Q: {
+                    auto home = new Home(m_Rect.getPosition().x, m_Rect.getPosition().y);
+                    m_Buildings.push_back(home);
+                    break;
+                }
+                case sf::Keyboard::W: {
+                    auto mine = new Mine(m_Rect.getPosition().x, m_Rect.getPosition().y);
+                    m_Buildings.push_back(mine);
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
+            break;
+        }
+        default: {
+            break;
+        }
+    }
 }
 
 void Self::BecomeServer(const std::string& serverName)
@@ -51,7 +76,8 @@ void Self::BecomeServer(const std::string& serverName)
 		m_Networker->GetUUID(),
 		m_Name,
 		m_Rect.getFillColor(),
-		m_Rect.getPosition()
+		m_Rect.getPosition(),
+        m_Rect.getRotation()
 	});
 	m_JoinedUUIDs.push_back(m_Networker->GetUUID());
 	m_Networker->Run();
@@ -64,7 +90,8 @@ void Self::BecomeClient()
 		m_Networker->GetUUID(),
 		m_Name,
 		m_Rect.getFillColor(),
-		m_Rect.getPosition()
+		m_Rect.getPosition(),
+        m_Rect.getRotation()
 	});
 	m_JoinedUUIDs.push_back(m_Networker->GetUUID());
 	m_Networker->Run();
@@ -88,18 +115,35 @@ Server* Self::GetServer()
 	return nullptr;
 }
 
-void Self::HandleConnection()
-{
+void Self::HandleConnection() {
+
+    // TODO: I have to do that better way :/
+    std::vector<BuildingData> buildingData;
+    for (auto building : m_Buildings) {
+        if (dynamic_cast<Home*>(building) != nullptr) {
+            buildingData.push_back({
+                BuildingType::Home,
+                building->GetPosition()
+            });
+        }
+        if (dynamic_cast<Mine*>(building) != nullptr) {
+            buildingData.push_back({
+               BuildingType::Mine,
+               building->GetPosition()
+           });
+        }
+    }
+
 	m_Networker->SetPlayerData({
 		m_Networker->GetUUID(),
 		m_Name,
 		m_Rect.getFillColor(),
 		m_Rect.getPosition(),
-		m_Rect.getRotation()
+		m_Rect.getRotation(),
+        buildingData
 	});
 
-	for (const PlayerData& player : m_Networker->GetPlayers())
-	{
+	for (const PlayerData& player : m_Networker->GetPlayers()) {
 		bool already = false;
 		for (int i = 0; i < m_JoinedUUIDs.size(); i++)
 		{

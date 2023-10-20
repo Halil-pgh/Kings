@@ -2,17 +2,16 @@
 
 #include "Entities/Entity.h"
 
-class Scene
-{
+class Scene {
 public:
-	Scene(std::string  name);
+	Scene(std::string name);
 	~Scene();
 
 	inline const std::string& GetName() const { return m_Name; }
 
 	void AddEntity(Entity* entity);
 
-	// Be carefull it deletes the entity from disk!
+	// Be careful it deletes the entity from disk!
 	void RemoveEntity(Entity* entity);
 
 	void OnUpdate(float deltaTime);

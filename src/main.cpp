@@ -2,8 +2,7 @@
 
 #include "Core/Application.h"
 
-int main()
-{
+int main() {
 	Application::Get()->Run();
 	Application::Destroy();
 }

@@ -2,8 +2,7 @@
 
 #include "Entities/Entity.h"
 
-class TextInput : public Entity
-{
+class TextInput : public Entity {
 public:
 	TextInput(float x, float y, float width, float height, const std::string& defaultText = "");
 

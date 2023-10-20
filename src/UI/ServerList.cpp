@@ -16,8 +16,7 @@ ServerList::ServerList()
 	m_RefreshButton(5 * WINDOW_SIZE.x / (COLUMNS * 4), WINDOW_SIZE.y - 3 * (WINDOW_SIZE.y / (ROWS * 4)),
 		WINDOW_SIZE.x / (COLUMNS * 2), WINDOW_SIZE.y / (ROWS * 2), "Refresh"),
 	m_JoinButton(9 * WINDOW_SIZE.x / (COLUMNS * 4), WINDOW_SIZE.y - 3 * (WINDOW_SIZE.y / (ROWS * 4)),
-		WINDOW_SIZE.x / (COLUMNS * 2), WINDOW_SIZE.y / (ROWS * 2), "Join")
-{
+		WINDOW_SIZE.x / (COLUMNS * 2), WINDOW_SIZE.y / (ROWS * 2), "Join") {
 	m_JoinButton.SetActive(false);
 	m_JoinButton.SetOnClickCallback([&]() {
 		m_Client->JoinServer(m_SelectedServerInfo);
@@ -25,16 +24,14 @@ ServerList::ServerList()
 	});
 }
 
-void ServerList::SetBackScene(const std::string& name)
-{
+void ServerList::SetBackScene(const std::string& name) {
 	m_BackButton.SetOnClickCallback([&]() {
 		m_Client->ShoutDown();
 		SceneManager::SetActiveScene(name);
 	});
 }
 
-void ServerList::SetClient(Client* client)
-{
+void ServerList::SetClient(Client* client) {
 	m_Client = client;
 	m_Client->RefreshServers();
 	m_RefreshButton.SetOnClickCallback([&]() {
@@ -42,22 +39,17 @@ void ServerList::SetClient(Client* client)
 	});
 }
 
-void ServerList::OnUpdate(float deltaTime)
-{
-	for (int i = 0; i < m_Client->m_ServerInfos.size(); i++)
-	{
+void ServerList::OnUpdate(float deltaTime) {
+	for (int i = 0; i < m_Client->m_ServerInfos.size(); i++) {
 		bool here = false;
-		for (ServerInfo& knownInfo : m_ServerInfos)
-		{
-			if (m_Client->m_ServerInfos[i] == knownInfo)
-			{
+		for (ServerInfo& knownInfo : m_ServerInfos) {
+			if (m_Client->m_ServerInfos[i] == knownInfo) {
 				here = true;
 				break;
 			}
 		}
 
-		if (!here)
-		{
+		if (!here) {
 			m_ServerInfos.push_back(m_Client->m_ServerInfos[i]);
 			auto fi = (float)i;
 			Button button = {

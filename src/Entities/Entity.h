@@ -1,7 +1,6 @@
 #pragma once
 
-class Entity
-{
+class Entity {
 public:
 	Entity() = default;
 	virtual ~Entity() = default;

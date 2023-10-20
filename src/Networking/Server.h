@@ -3,8 +3,7 @@
 #include "Data/PlayerData.h"
 #include "Client.h"
 
-class Server : public Networker
-{
+class Server : public Networker {
 public:
 	explicit Server(std::string name);
 	~Server() override;

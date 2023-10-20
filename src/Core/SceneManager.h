@@ -2,8 +2,7 @@
 
 #include "Scene.h"
 
-class SceneManager
-{
+class SceneManager {
 public:
 	static void Init();
 	static void Destroy();

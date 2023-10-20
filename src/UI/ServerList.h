@@ -4,8 +4,7 @@
 #include "Entities/Entity.h"
 #include "Networking/Client.h"
 
-class ServerList : public Entity
-{
+class ServerList : public Entity {
 public:
 	ServerList();
 

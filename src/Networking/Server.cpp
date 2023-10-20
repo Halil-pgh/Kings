@@ -7,19 +7,16 @@
 #include "Data/Connections.h"
 #include "Data/ServerData.h"
 
-struct ClientData
-{
+struct ClientData {
 	sf::IpAddress ip;
 	unsigned short port;
 };
 
 Server::Server(std::string name)
-	: m_Name(std::move(name))
-{
+	: m_Name(std::move(name)) {
 	m_Data.uuid = GenerateUUID();
 
-	if (m_Socket.bind(PORT) != sf::Socket::Done)
-	{
+	if (m_Socket.bind(PORT) != sf::Socket::Done) {
 		std::cout << "Failed to bind the port " << PORT << "!\n";
 		assert(false);
 	}
@@ -29,14 +26,12 @@ Server::Server(std::string name)
 	m_Players.push_back(m_Data);
 }
 
-Server::~Server()
-{
+Server::~Server() {
 	if (m_Thread.joinable())
 		m_Thread.join();
 }
 
-void Server::Run()
-{
+void Server::Run() {
 	m_Thread = std::thread([&]() {
 
 		// Warning: clients and m_Players are needs to sync!
@@ -44,17 +39,14 @@ void Server::Run()
 		sf::IpAddress clientIp;
 		unsigned short clientPort;
 
-		while (true)
-		{
+		while (true) {
 			sf::Packet packet;
-			if (m_Socket.receive(packet, clientIp, clientPort) != sf::Socket::NotReady)
-			{
+			if (m_Socket.receive(packet, clientIp, clientPort) != sf::Socket::NotReady) {
 				unsigned int typeInt;
 				packet >> typeInt;
 				auto type = (DataTypes)typeInt;
 
-				if (type == DataTypes::ConnectionRequest)
-				{
+				if (type == DataTypes::ConnectionRequest) {
 					PlayerData data;
 					packet >> data;
 
@@ -73,14 +65,12 @@ void Server::Run()
 					};
 					packet << accept;
 
-					if (m_Socket.send(packet, clientIp, clientPort) != sf::Socket::Done)
-					{
+					if (m_Socket.send(packet, clientIp, clientPort) != sf::Socket::Done) {
 						std::cout << "Failed to send client " << clientIp << ":" << clientPort << " accepted!\n";
 						assert(false);
 					}
 				}
-				else if (type == DataTypes::PlayerData)
-				{
+				else if (type == DataTypes::PlayerData) {
 					PlayerData data;
 					packet >> data;
 
@@ -88,8 +78,7 @@ void Server::Run()
 						if (player.uuid == data.uuid)
 							player = data;
 				}
-				else if (type == DataTypes::ConnectionAvailableRequest)
-				{
+				else if (type == DataTypes::ConnectionAvailableRequest) {
 					ConnectionAvailable conn = {
 						m_Name,
                         (unsigned int)m_Players.size()
@@ -100,8 +89,7 @@ void Server::Run()
 					packet << (unsigned int)DataTypes::ConnectionAvailable;
 					packet << conn;
 
-					if (m_Socket.send(packet, clientIp, clientPort) != sf::Socket::Done)
-					{
+					if (m_Socket.send(packet, clientIp, clientPort) != sf::Socket::Done) {
 						std::cout << "Failed to send client " << clientIp << ":" << clientPort << " available!\n";
 						assert(false);
 					}
@@ -116,10 +104,8 @@ void Server::Run()
 
 			packet << serverData;
 
-			for (ClientData& client : clients)
-			{
-				if (m_Socket.send(packet, client.ip, client.port) != sf::Socket::Done)
-				{
+			for (ClientData& client : clients) {
+				if (m_Socket.send(packet, client.ip, client.port) != sf::Socket::Done) {
 					std::cout << "Failed to send players data to " << client.ip << ":" << client.port << "\n";
 					assert(false);
 				}

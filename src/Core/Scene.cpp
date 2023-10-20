@@ -4,26 +4,21 @@
 #include <utility>
 
 Scene::Scene(std::string name)
-	: m_Name(std::move(name))
-{
+	: m_Name(std::move(name)) {
 }
 
-Scene::~Scene()
-{
+Scene::~Scene() {
 	for (Entity* entity : m_Entites)
 		delete entity;
 }
 
-void Scene::AddEntity(Entity* entity)
-{
+void Scene::AddEntity(Entity* entity) {
 	m_Entites.push_back(entity);
 }
 
-void Scene::RemoveEntity(Entity* entity)
-{
+void Scene::RemoveEntity(Entity* entity) {
 	auto it = std::find(m_Entites.begin(), m_Entites.end(), entity);
-	if (it == m_Entites.end())
-	{
+	if (it == m_Entites.end()) {
 		std::cout << "Entity couldn't found: " << entity << "\n";
 		return;
 	}
@@ -31,20 +26,17 @@ void Scene::RemoveEntity(Entity* entity)
 	delete entity;
 }
 
-void Scene::OnUpdate(float deltaTime)
-{
+void Scene::OnUpdate(float deltaTime) {
 	for (Entity* entity : m_Entites)
 		entity->OnUpdate(deltaTime);
 }
 
-void Scene::OnDraw(sf::RenderWindow& window)
-{
+void Scene::OnDraw(sf::RenderWindow& window) {
 	for (Entity* entity : m_Entites)
 		entity->OnDraw(window);
 }
 
-void Scene::OnEvent(const sf::Event& event)
-{
+void Scene::OnEvent(const sf::Event& event) {
 	for (Entity* entity : m_Entites)
 		entity->OnEvent(event);
 }

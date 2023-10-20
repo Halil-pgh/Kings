@@ -6,17 +6,14 @@
 class FontManager
 {
 public:
-	static void SetFont(const std::string& fileName)
-	{
-		if (!s_Font.loadFromFile(fileName))
-		{
+	static void SetFont(const std::string& fileName) {
+		if (!s_Font.loadFromFile(fileName)) {
 			std::cout << "Failed to load font from file: " << fileName << "!\n";
 			exit(-1);
 		}
 	}
 
-	inline static const sf::Font& GetFont()
-	{
+	inline static const sf::Font& GetFont() {
 		return s_Font;
 	}
 

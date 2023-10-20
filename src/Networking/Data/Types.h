@@ -1,7 +1,6 @@
 #pragma once
 
-enum class DataTypes
-{
+enum class DataTypes {
 	ConnectionAvailableRequest,
 	ConnectionAvailable,
 	ConnectionRequest,

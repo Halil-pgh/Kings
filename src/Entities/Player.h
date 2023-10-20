@@ -2,9 +2,9 @@
 
 #include "Entity.h"
 #include "Networking/Data/PlayerData.h"
+#include "Buildings/Building.h"
 
-class Player : public Entity
-{
+class Player : public Entity {
 public:
 	Player();
 	~Player() override = default;
@@ -21,4 +21,6 @@ protected:
 	sf::Text m_Text;
 	std::string m_Name;
 	sf::Vector2f m_Velocity;
+
+    std::vector<Building*> m_Buildings;
 };

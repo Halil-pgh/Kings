@@ -4,8 +4,7 @@
 #include <random>
 #include "Data/PlayerData.h"
 
-class Networker
-{
+class Networker {
 public:
 	Networker() = default;
 	virtual ~Networker() = default;
@@ -17,8 +16,7 @@ public:
 	virtual uint64_t GetUUID() = 0;
 
 protected:
-	static uint64_t GenerateUUID()
-	{
+	static uint64_t GenerateUUID() {
 		std::random_device rd;
 		std::mt19937_64 generator(rd());
 
