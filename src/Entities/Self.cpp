@@ -51,64 +51,22 @@ void Self::OnEvent(const sf::Event& event) {
     }
 }
 
-void Self::BecomeServer(const std::string& serverName) {
-	m_Networker = new Server(serverName);
-	m_Networker->SetPlayerData({
-		m_Networker->GetUUID(),
-		m_Name,
-		m_Rect.getFillColor(),
-		m_Rect.getPosition(),
-        m_Rect.getRotation()
-	});
-	m_JoinedUUIDs.push_back(m_Networker->GetUUID());
-	m_Networker->Run();
-}
-
-void Self::BecomeClient() {
-	m_Networker = new Client();
-	m_Networker->SetPlayerData({
-		m_Networker->GetUUID(),
-		m_Name,
-		m_Rect.getFillColor(),
-		m_Rect.getPosition(),
-        m_Rect.getRotation()
-	});
-	m_JoinedUUIDs.push_back(m_Networker->GetUUID());
-	m_Networker->Run();
-}
-
-Client* Self::GetClient() {
-	auto client = dynamic_cast<Client*>(m_Networker);
-	if (client)
-		return client;
-	std::cout << "Client is null!\n";
-	return nullptr;
-}
-
-Server* Self::GetServer() {
-	auto server = dynamic_cast<Server*>(m_Networker);
-	if (server)
-		return server;
-	std::cout << "Server is null!\n";
-	return nullptr;
-}
-
 void Self::HandleConnection() {
 
     // TODO: I have to do that better way :/
-    std::vector<BuildingData> buildingData;
+    std::vector<BuildingData> buildingData(m_Buildings.size());
     for (auto building : m_Buildings) {
-        if (dynamic_cast<Home*>(building) != nullptr) {
-            buildingData.push_back({
-                BuildingType::Home,
-                building->GetPosition()
-            });
-        }
         if (dynamic_cast<Mine*>(building) != nullptr) {
             buildingData.push_back({
                BuildingType::Mine,
                building->GetPosition()
            });
+        }
+        else if (dynamic_cast<Home*>(building) != nullptr) {
+            buildingData.push_back({
+                BuildingType::Home,
+                building->GetPosition()
+            });
         }
     }
 
@@ -162,4 +120,46 @@ void Self::FollowMouse() {
         m_Velocity.x = xdiff / times;
         m_Velocity.y = ydiff / times;
     }
+}
+
+void Self::BecomeServer(const std::string& serverName) {
+    m_Networker = new Server(serverName);
+    m_Networker->SetPlayerData({
+       m_Networker->GetUUID(),
+       m_Name,
+       m_Rect.getFillColor(),
+       m_Rect.getPosition(),
+       m_Rect.getRotation()
+    });
+    m_JoinedUUIDs.push_back(m_Networker->GetUUID());
+    m_Networker->Run();
+}
+
+void Self::BecomeClient() {
+    m_Networker = new Client();
+    m_Networker->SetPlayerData({
+       m_Networker->GetUUID(),
+       m_Name,
+       m_Rect.getFillColor(),
+       m_Rect.getPosition(),
+       m_Rect.getRotation()
+    });
+    m_JoinedUUIDs.push_back(m_Networker->GetUUID());
+    m_Networker->Run();
+}
+
+Client* Self::GetClient() {
+    auto client = dynamic_cast<Client*>(m_Networker);
+    if (client)
+        return client;
+    std::cout << "Client is null!\n";
+    return nullptr;
+}
+
+Server* Self::GetServer() {
+    auto server = dynamic_cast<Server*>(m_Networker);
+    if (server)
+        return server;
+    std::cout << "Server is null!\n";
+    return nullptr;
 }

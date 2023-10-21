@@ -101,7 +101,8 @@ void Server::Run() {
 			packet << (unsigned int)DataTypes::ServerData;
 
 			ServerData serverData;
-			serverData.players = m_Players;
+            std::lock_guard<std::mutex> lock(m_PlayersMutex);
+            serverData.players = m_Players;
 
 			packet << serverData;
 
@@ -113,4 +114,10 @@ void Server::Run() {
 			}
 		}
 	});
+}
+
+void Server::SetPlayerData(const PlayerData &data) {
+    std::lock_guard<std::mutex> lock(m_PlayersMutex);
+    m_Data = data;
+    m_Players[0] = data;
 }

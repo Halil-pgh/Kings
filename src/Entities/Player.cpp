@@ -49,7 +49,7 @@ void Player::Reload(const PlayerData& data) {
         delete building;
     }
     m_Buildings.clear();
-
+    m_Buildings.reserve(data.buildings.size());
     for (const auto& building : data.buildings) {
         switch (building.type) {
             case BuildingType::Home: {
