@@ -1,7 +1,7 @@
 #include "Mine.h"
 
 Mine::Mine(float x, float y)
-    : Building(x, y, sf::Color(209, 199, 8)) {
+	: Building(x, y, sf::Color(209, 199, 8)) {
 }
 
 void Mine::OnUpdate(float deltaTime) {

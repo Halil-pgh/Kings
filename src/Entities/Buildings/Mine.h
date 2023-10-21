@@ -4,8 +4,8 @@
 
 class Mine : public Building {
 public:
-    Mine(float x, float y);
+	Mine(float x, float y);
 
-    void OnUpdate(float deltaTime) override;
-    void OnEvent(const sf::Event &event) override;
+	void OnUpdate(float deltaTime) override;
+	void OnEvent(const sf::Event &event) override;
 };

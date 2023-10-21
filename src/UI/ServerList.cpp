@@ -26,8 +26,8 @@ ServerList::ServerList()
 
 void ServerList::SetBackScene(const std::string& name) {
 	m_BackButton.SetOnClickCallback([&]() {
-        SceneManager::SetActiveScene(name);
-        m_Client->ShoutDown();
+		SceneManager::SetActiveScene(name);
+		m_Client->ShoutDown();
 	});
 }
 

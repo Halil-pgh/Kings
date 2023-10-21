@@ -24,8 +24,8 @@ private:
 
 	std::string m_Name;
 	std::thread m_Thread;
-    std::mutex m_PlayersMutex;
+	std::mutex m_PlayersMutex;
 
-    sf::UdpSocket m_Socket;
+	sf::UdpSocket m_Socket;
 	sf::IpAddress m_Ip;
 };

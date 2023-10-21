@@ -6,7 +6,7 @@
 
 Button::Button(float x, float y, float width, float height, const std::string& mess)
 	: m_NormalColor(255, 255, 255), m_HighlightedColor(200, 200, 200),
-    m_PressedColor(150, 150, 150),
+	m_PressedColor(150, 150, 150),
 	m_OnClick([]() {}) {
 	m_Rect.setPosition(x, y);
 	m_Rect.setSize({ width, height });
@@ -16,7 +16,7 @@ Button::Button(float x, float y, float width, float height, const std::string& m
 	m_Text.setCharacterSize(18);
 
 	m_Text.setPosition((m_Rect.getPosition().x + (m_Rect.getSize().x - m_Text.getLocalBounds().width) / 2),
-                       (m_Rect.getPosition().y + (m_Rect.getSize().y - m_Text.getLocalBounds().height) / 2));
+					   (m_Rect.getPosition().y + (m_Rect.getSize().y - m_Text.getLocalBounds().height) / 2));
 	m_Text.setFillColor(sf::Color::Black);
 }
 
@@ -65,8 +65,8 @@ void Button::OnEvent(const sf::Event& event) {
 			}
 			break;
 		}
-        default:
-            break;
+		default:
+			break;
 	}
 }
 
@@ -75,7 +75,7 @@ bool Button::isMouseOn()
 	const sf::WindowBase& windowBase = Application::Get()->GetWindowBase();
 
 	return (float)sf::Mouse::getPosition(windowBase).x > m_Rect.getPosition().x &&
-            (float)sf::Mouse::getPosition(windowBase).x < m_Rect.getPosition().x + m_Rect.getSize().x &&
-            (float)sf::Mouse::getPosition(windowBase).y > m_Rect.getPosition().y &&
-            (float)sf::Mouse::getPosition(windowBase).y < m_Rect.getPosition().y + m_Rect.getSize().y;
+			(float)sf::Mouse::getPosition(windowBase).x < m_Rect.getPosition().x + m_Rect.getSize().x &&
+			(float)sf::Mouse::getPosition(windowBase).y > m_Rect.getPosition().y &&
+			(float)sf::Mouse::getPosition(windowBase).y < m_Rect.getPosition().y + m_Rect.getSize().y;
 }

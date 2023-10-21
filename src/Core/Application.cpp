@@ -15,7 +15,7 @@ Application* Application::s_Instance = nullptr;
 Application::Application() {
 	m_Window.create(sf::VideoMode(1024, 640), "Game");
 	m_Camera = m_Window.getDefaultView();
-    Random::Init();
+	Random::Init();
 	SceneManager::Init();
 	FontManager::SetFont("assets/fonts/arial.ttf");
 }
@@ -54,12 +54,12 @@ void Application::Run() {
 	auto gameScene = new Scene("Game");
 	gameScene->AddEntity(self);
 
-    auto mainScene = new Scene("Main");
+	auto mainScene = new Scene("Main");
 	mainScene->AddEntity(textInput);
 	mainScene->AddEntity(createButton);
 	mainScene->AddEntity(joinButton);
 
-    auto serverListScene = new Scene("Server List");
+	auto serverListScene = new Scene("Server List");
 	serverListScene->AddEntity(serverList);
 
 	SceneManager::AddScene(mainScene);

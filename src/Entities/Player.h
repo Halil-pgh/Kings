@@ -22,5 +22,5 @@ protected:
 	std::string m_Name;
 	sf::Vector2f m_Velocity;
 
-    std::vector<Building*> m_Buildings;
+	std::vector<Building*> m_Buildings;
 };

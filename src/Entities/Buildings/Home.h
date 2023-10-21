@@ -4,8 +4,8 @@
 
 class Home : public Building {
 public:
-    Home(float x, float y);
+	Home(float x, float y);
 
-    void OnUpdate(float deltaTime) override;
-    void OnEvent(const sf::Event &event) override;
+	void OnUpdate(float deltaTime) override;
+	void OnEvent(const sf::Event &event) override;
 };

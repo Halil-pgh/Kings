@@ -26,9 +26,9 @@ void Player::OnDraw(sf::RenderWindow& window) {
 	window.draw(m_Rect);
 	window.draw(m_Text);
 
-    for (auto building : m_Buildings) {
-        building->OnDraw(window);
-    }
+	for (auto building : m_Buildings) {
+		building->OnDraw(window);
+	}
 }
 
 void Player::SetName(const std::string& name) {
@@ -44,20 +44,20 @@ void Player::Reload(const PlayerData& data) {
 	m_Text.setPosition(TEXT_POS_X, TEXT_POS_Y);
 	m_Text.setString(data.name);
 
-    // TODO: pls find a better way around :/
-    for (auto building : m_Buildings) {
-        delete building;
-    }
-    m_Buildings.clear();
-    m_Buildings.reserve(data.buildings.size());
-    for (const auto& building : data.buildings) {
-        switch (building.type) {
-            case BuildingType::Home: {
-                m_Buildings.push_back(new Home(building.position.x, building.position.y));
-            }
-            case BuildingType::Mine: {
-                m_Buildings.push_back(new Mine(building.position.x, building.position.y));
-            }
-        }
-    }
+	// TODO: pls find a better way around :/
+	for (auto building : m_Buildings) {
+		delete building;
+	}
+	m_Buildings.clear();
+	m_Buildings.reserve(data.buildings.size());
+	for (const auto& building : data.buildings) {
+		switch (building.type) {
+			case BuildingType::Home: {
+				m_Buildings.push_back(new Home(building.position.x, building.position.y));
+			}
+			case BuildingType::Mine: {
+				m_Buildings.push_back(new Mine(building.position.x, building.position.y));
+			}
+		}
+	}
 }

@@ -11,12 +11,12 @@ struct PlayerData {
 	sf::Vector2f position;
 	float rotation;
 
-    std::vector<BuildingData> buildings;
+	std::vector<BuildingData> buildings;
 };
 
 inline sf::Packet& operator<<(sf::Packet& packet, const PlayerData& data) {
 	return packet << (sf::Uint64)data.uuid << data.name << data.color << data.position << data.rotation
-        << data.buildings;
+		<< data.buildings;
 }
 
 inline sf::Packet& operator>>(sf::Packet& packet, PlayerData& data) {

@@ -62,7 +62,7 @@ void Server::Run() {
 					packet << (unsigned int)DataTypes::ConnectionAccept;
 					ConnectionAccept accept = {
 						m_Name,
-                        (unsigned int)m_Players.size()
+						(unsigned int)m_Players.size()
 					};
 					packet << accept;
 
@@ -82,7 +82,7 @@ void Server::Run() {
 				else if (type == DataTypes::ConnectionAvailableRequest) {
 					ConnectionAvailable conn = {
 						m_Name,
-                        (unsigned int)m_Players.size()
+						(unsigned int)m_Players.size()
 					};
 
 					packet.clear();
@@ -101,8 +101,8 @@ void Server::Run() {
 			packet << (unsigned int)DataTypes::ServerData;
 
 			ServerData serverData;
-            std::lock_guard<std::mutex> lock(m_PlayersMutex);
-            serverData.players = m_Players;
+			std::lock_guard<std::mutex> lock(m_PlayersMutex);
+			serverData.players = m_Players;
 
 			packet << serverData;
 
@@ -117,7 +117,7 @@ void Server::Run() {
 }
 
 void Server::SetPlayerData(const PlayerData &data) {
-    std::lock_guard<std::mutex> lock(m_PlayersMutex);
-    m_Data = data;
-    m_Players[0] = data;
+	std::lock_guard<std::mutex> lock(m_PlayersMutex);
+	m_Data = data;
+	m_Players[0] = data;
 }

@@ -4,5 +4,5 @@
 std::mt19937_64 Random::m_RandomEngine;
 
 void Random::Init() {
-    m_RandomEngine.seed(std::random_device()());
+	m_RandomEngine.seed(std::random_device()());
 }
