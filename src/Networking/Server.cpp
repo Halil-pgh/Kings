@@ -28,11 +28,13 @@ Server::Server(std::string name)
 }
 
 Server::~Server() {
+	m_Running = false;
 	if (m_Thread.joinable())
 		m_Thread.join();
 }
 
 void Server::Run() {
+	m_Running = true;
 	m_Thread = std::thread([&]() {
 
 		// Warning: clients and m_Players are needs to sync!
@@ -40,7 +42,7 @@ void Server::Run() {
 		sf::IpAddress clientIp;
 		unsigned short clientPort;
 
-		while (Application::Get()->IsRunning()) {
+		while (m_Running) {
 			sf::Packet packet;
 			if (m_Socket.receive(packet, clientIp, clientPort) != sf::Socket::NotReady) {
 				unsigned int typeInt;
@@ -120,4 +122,10 @@ void Server::SetPlayerData(const PlayerData &data) {
 	std::lock_guard<std::mutex> lock(m_PlayersMutex);
 	m_Data = data;
 	m_Players[0] = data;
+}
+
+void Server::ShoutDown() {
+	m_Running = false;
+	if (m_Thread.joinable())
+		m_Thread.join();
 }

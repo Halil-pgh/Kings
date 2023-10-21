@@ -2,7 +2,6 @@
 #include "Client.h"
 
 #include <cassert>
-#include "Core/Application.h"
 #include "Data/Types.h"
 #include "Data/Connections.h"
 #include "Data/ServerData.h"
@@ -19,11 +18,14 @@ Client::Client() {
 }
 
 Client::~Client() {
-	if (m_Thread.joinable())
+	m_Running = false;
+	if (m_Thread.joinable()) {
 		m_Thread.join();
+	}
 }
 
 void Client::Run() {
+	m_Running = true;
 	m_Thread = std::thread([&]() {
 		sf::IpAddress serverIp;
 		unsigned short serverPort;
@@ -31,9 +33,9 @@ void Client::Run() {
 		sf::IpAddress receivedIP;
 		unsigned short receivedPort;
 
-		while (Application::Get()->IsRunning()) {
+		while (m_Running) {
 			sf::Packet packet;
-			if (!m_Connected){
+			if (!m_Connected) {
 				if (m_Socket.receive(packet, serverIp, serverPort) != sf::Socket::NotReady) {
 					unsigned int typeInt;
 					packet >> typeInt;
@@ -104,5 +106,12 @@ void Client::JoinServer(const ServerInfo& server) {
 	if (m_Socket.send(packet, server.ip, server.port) != sf::Socket::Done) {
 		std::cout << "Failed to send connection request to " << server.ip << ":" << server.port << "!\n";
 		assert(false);
+	}
+}
+
+void Client::ShoutDown() {
+	m_Running = false;
+	if (m_Thread.joinable()) {
+		m_Thread.join();
 	}
 }

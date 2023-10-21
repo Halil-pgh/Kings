@@ -83,9 +83,11 @@ void Self::HandleConnection() {
 		bool already = false;
 		for (int i = 0; i < m_JoinedUUIDs.size(); i++) {
 			if (m_JoinedUUIDs[i] == player.uuid) {
+				std::cout << "Reloading " << player.uuid << " with i:" << i << "\n";
 				if (i > 0)
 					m_OtherPlayers[i - 1]->Reload(player);
 				already = true;
+				break;
 			}
 		}
 
@@ -125,6 +127,10 @@ void Self::FollowMouse() {
 }
 
 void Self::BecomeServer(const std::string& serverName) {
+	// Delete/clear everything before becoming server!
+	delete m_Networker;
+	m_JoinedUUIDs.clear();
+
 	m_Networker = new Server(serverName);
 	m_Networker->SetPlayerData({
 	   m_Networker->GetUUID(),
@@ -138,6 +144,10 @@ void Self::BecomeServer(const std::string& serverName) {
 }
 
 void Self::BecomeClient() {
+	// Delete/clear everything before becoming client!
+	delete m_Networker;
+	m_JoinedUUIDs.clear();
+
 	m_Networker = new Client();
 	m_Networker->SetPlayerData({
 	   m_Networker->GetUUID(),

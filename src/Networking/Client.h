@@ -19,7 +19,7 @@ public:
 	~Client() override;
 
 	void Run() override;
-	void ShoutDown() override { m_Thread.join(); }
+	void ShoutDown() override;
 
 	inline const std::vector<PlayerData>& GetPlayers() const override { return m_Players; }
 	inline void SetPlayerData(const PlayerData& data) override { m_Data = data; }
@@ -37,6 +37,7 @@ private:
 
 	std::vector<ServerInfo> m_ServerInfos;
 
+	bool m_Running = false;
 	bool m_Connected = false;
 
 	friend class ServerList;

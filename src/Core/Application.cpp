@@ -18,6 +18,11 @@ Application::Application() {
 	Random::Init();
 	SceneManager::Init();
 	FontManager::SetFont("assets/fonts/arial.ttf");
+
+#ifdef WIN32
+	// Just to see console output on debug mode (clion)
+	setvbuf(stdout, nullptr, _IONBF, 0);
+#endif
 }
 
 Application::~Application() {

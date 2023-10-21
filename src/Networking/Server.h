@@ -9,7 +9,7 @@ public:
 	~Server() override;
 
 	void Run() override;
-	void ShoutDown() override { m_Thread.join(); }
+	void ShoutDown() override;
 
 	inline const std::vector<PlayerData>& GetPlayers() const override { return m_Players; }
 	inline void SetPlayerData(const PlayerData& data) override;
@@ -25,6 +25,7 @@ private:
 	std::string m_Name;
 	std::thread m_Thread;
 	std::mutex m_PlayersMutex;
+	bool m_Running = false;
 
 	sf::UdpSocket m_Socket;
 	sf::IpAddress m_Ip;
