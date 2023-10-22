@@ -27,6 +27,7 @@ Application::Application() {
 
 Application::~Application() {
 	SceneManager::Destroy();
+	FontManager::Destroy();
 }
 
 void Application::Run() {

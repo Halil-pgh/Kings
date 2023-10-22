@@ -5,19 +5,33 @@
 
 class FontManager {
 public:
+	static FontManager* Get() {
+		if (!s_Instance)
+			s_Instance = new FontManager();
+		return s_Instance;
+	}
+
+	static void Destroy() {
+		delete s_Instance;
+	}
+
 	static void SetFont(const std::string& fileName) {
-		if (!s_Font.loadFromFile(fileName)) {
+		if (!Get()->m_Font.loadFromFile(fileName)) {
 			std::cout << "Failed to load font from file: " << fileName << "!\n";
 			exit(-1);
 		}
 	}
 
 	inline static const sf::Font& GetFont() {
-		return s_Font;
+		return Get()->m_Font;
 	}
 
 private:
-	static sf::Font s_Font;
+	FontManager() = default;
+
+private:
+	static FontManager* s_Instance;
+	sf::Font m_Font;
 };
 
-inline sf::Font FontManager::s_Font;
+inline FontManager* FontManager::s_Instance;
