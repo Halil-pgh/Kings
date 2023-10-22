@@ -4,6 +4,11 @@
 #include "Networking/Client.h"
 #include "Networking/Server.h"
 
+enum class Mode {
+	Walk,
+	Build
+};
+
 class Self : public Player {
 public:
 	Self();
@@ -21,6 +26,10 @@ public:
 private:
 	void FollowMouse();
 	void HandleConnection();
+
+private:
+	Mode m_Mode = Mode::Walk;
+	BuildingType m_BuildType;
 
 private:
 	float m_Speed;

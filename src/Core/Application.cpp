@@ -101,3 +101,12 @@ Application* Application::Get() {
 void Application::Destroy() {
 	delete s_Instance;
 }
+
+sf::Vector2f Application::GetMousePosition() {
+	sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(Application::Get()->GetWindowBase()));
+	mousePos.x += Application::Get()->GetCamera().getCenter().x -
+			Application::Get()->GetCamera().getSize().x / 2;
+	mousePos.y += Application::Get()->GetCamera().getCenter().y -
+			Application::Get()->GetCamera().getSize().y / 2;
+	return mousePos;
+}

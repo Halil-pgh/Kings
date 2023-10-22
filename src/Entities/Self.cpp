@@ -17,9 +17,12 @@ Self::~Self() {
 }
 
 void Self::OnUpdate(float deltaTime) {
-	m_Text.move(m_Velocity * deltaTime);
-	m_Rect.move(m_Velocity * deltaTime);
 	Application::Get()->GetCamera().setCenter(m_Rect.getPosition() + sf::Vector2f{m_Rect.getSize().x / 2, m_Rect.getSize().y / 2});
+
+	if (m_Mode == Mode::Walk) {
+		m_Text.move(m_Velocity * deltaTime);
+		m_Rect.move(m_Velocity * deltaTime);
+	}
 
 	FollowMouse();
 	HandleConnection();
@@ -30,17 +33,36 @@ void Self::OnEvent(const sf::Event& event) {
 		case sf::Event::KeyPressed: {
 			switch (event.key.code) {
 				case sf::Keyboard::Q: {
-					auto home = new Home(m_Rect.getPosition().x, m_Rect.getPosition().y);
-					m_Buildings.push_back(home);
+					m_Mode = Mode::Build;
+					m_BuildType = BuildingType::Home;
 					break;
 				}
 				case sf::Keyboard::W: {
-					auto mine = new Mine(m_Rect.getPosition().x, m_Rect.getPosition().y);
-					m_Buildings.push_back(mine);
+					m_Mode = Mode::Build;
+					m_BuildType = BuildingType::Mine;
 					break;
 				}
 				default: {
 					break;
+				}
+			}
+			break;
+		}
+		case sf::Event::MouseButtonPressed: {
+			if (event.mouseButton.button == sf::Mouse::Button::Left) {
+				if (m_Mode == Mode::Build) {
+					sf::Vector2f mousePos = Application::GetMousePosition();
+					switch (m_BuildType) {
+						case BuildingType::Home: {
+							m_Buildings.push_back(new Home(mousePos.x, mousePos.y));
+							break;
+						}
+						case BuildingType::Mine: {
+							m_Buildings.push_back(new Mine(mousePos.x, mousePos.y));
+							break;
+						}
+					}
+					m_Mode = Mode::Walk;
 				}
 			}
 			break;
@@ -105,13 +127,7 @@ void Self::HandleConnection() {
 }
 
 void Self::FollowMouse() {
-	// Calculating mouse positing
-	sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(Application::Get()->GetWindowBase()));
-	mousePos.x += Application::Get()->GetCamera().getCenter().x -
-			Application::Get()->GetCamera().getSize().x / 2;
-	mousePos.y += Application::Get()->GetCamera().getCenter().y -
-			Application::Get()->GetCamera().getSize().y / 2;
-
+	sf::Vector2f mousePos = Application::GetMousePosition();
 	float xdiff = mousePos.x - m_Rect.getPosition().x;
 	float ydiff = mousePos.y - m_Rect.getPosition().y;
 	float radian = atan2f(ydiff, xdiff);
