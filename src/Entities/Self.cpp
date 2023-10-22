@@ -83,7 +83,6 @@ void Self::HandleConnection() {
 		bool already = false;
 		for (int i = 0; i < m_JoinedUUIDs.size(); i++) {
 			if (m_JoinedUUIDs[i] == player.uuid) {
-				std::cout << "Reloading " << player.uuid << " with i:" << i << "\n";
 				if (i > 0)
 					m_OtherPlayers[i - 1]->Reload(player);
 				already = true;

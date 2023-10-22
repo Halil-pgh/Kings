@@ -41,8 +41,7 @@ void Player::Reload(const PlayerData& data) {
 	m_Rect.setFillColor(data.color);
 	m_Rect.setRotation(data.rotation);
 	m_Rect.setPosition(data.position);
-	m_Text.setPosition(TEXT_POS_X, TEXT_POS_Y);
-	m_Text.setString(data.name);
+	SetName(data.name);
 
 	// TODO: pls find a better way around :/
 	for (auto building : m_Buildings) {

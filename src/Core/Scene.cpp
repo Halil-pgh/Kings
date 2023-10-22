@@ -27,16 +27,16 @@ void Scene::RemoveEntity(Entity* entity) {
 }
 
 void Scene::OnUpdate(float deltaTime) {
-	for (Entity* entity : m_Entites)
-		entity->OnUpdate(deltaTime);
+	for (uint32_t i = 0; i < m_Entites.size(); i++)
+		m_Entites[i]->OnUpdate(deltaTime);
 }
 
 void Scene::OnDraw(sf::RenderWindow& window) {
-	for (Entity* entity : m_Entites)
-		entity->OnDraw(window);
+	for (uint32_t i = 0; i < m_Entites.size(); i++)
+		m_Entites[i]->OnDraw(window);
 }
 
 void Scene::OnEvent(const sf::Event& event) {
-	for (Entity* entity : m_Entites)
-		entity->OnEvent(event);
+	for (uint32_t i = 0; i < m_Entites.size(); i++)
+		m_Entites[i]->OnEvent(event);
 }
