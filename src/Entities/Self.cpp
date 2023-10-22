@@ -58,8 +58,8 @@ void Self::HandleConnection() {
 	for (auto building : m_Buildings) {
 		if (dynamic_cast<Mine*>(building) != nullptr) {
 			buildingData.push_back({
-			   BuildingType::Mine,
-			   building->GetPosition()
+				BuildingType::Mine,
+				building->GetPosition()
 		   });
 		}
 		else if (dynamic_cast<Home*>(building) != nullptr) {

@@ -53,9 +53,11 @@ void Player::Reload(const PlayerData& data) {
 		switch (building.type) {
 			case BuildingType::Home: {
 				m_Buildings.push_back(new Home(building.position.x, building.position.y));
+				break;
 			}
 			case BuildingType::Mine: {
 				m_Buildings.push_back(new Mine(building.position.x, building.position.y));
+				break;
 			}
 		}
 	}
