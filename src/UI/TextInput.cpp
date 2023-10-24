@@ -55,7 +55,7 @@ void TextInput::OnDraw(sf::RenderWindow& window) {
 void TextInput::OnEvent(const sf::Event& event) {
 	if (m_TakeInput) {
 		if (event.type == sf::Event::TextEntered) {
-			// Backspace (i couldnt found a const for backspace unicode)
+			// Backspace (I couldn't find a const for backspace unicode)
 			if (event.text.unicode == 8) {
 				if (!m_Input.empty()) {
 					m_Input.pop_back();
@@ -84,4 +84,16 @@ bool TextInput::isMouseOn()
 			(float)sf::Mouse::getPosition(windowBase).x < m_Rect.getPosition().x + m_Rect.getSize().x &&
 			(float)sf::Mouse::getPosition(windowBase).y > m_Rect.getPosition().y &&
 			(float)sf::Mouse::getPosition(windowBase).y < m_Rect.getPosition().y + m_Rect.getSize().y;
+}
+
+std::string TextInput::Get() {
+	auto inputBegin = m_Input.find_first_not_of(' ');
+	auto inputEnd = m_Input.find_last_not_of(' ');
+	if (inputBegin == std::string::npos) {
+		m_Input = "";
+		return m_Input;
+	}
+	auto inputRange = inputEnd - inputBegin + 1;
+	m_Input = m_Input.substr(inputBegin, inputRange);
+	return m_Input;
 }

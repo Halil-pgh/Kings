@@ -10,7 +10,7 @@ public:
 	void OnDraw(sf::RenderWindow& window) override;
 	void OnEvent(const sf::Event& event) override;
 
-	inline const std::string& Get() const { return m_Input; }
+	std::string Get();
 
 private:
 	bool isMouseOn();
