@@ -86,7 +86,6 @@ void Self::OnEvent(const sf::Event& event) {
 }
 
 void Self::HandleConnection() {
-
 	// TODO: I have to do that better way :/
 	std::vector<BuildingData> buildingData(m_Buildings.size());
 	for (auto building : m_Buildings) {

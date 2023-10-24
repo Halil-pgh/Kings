@@ -1,7 +1,10 @@
 #include "Mine.h"
 
+#include "Core/TextureManager.h"
+
 Mine::Mine(float x, float y)
-	: Building(x, y, sf::Color(209, 199, 8)) {
+	: Building(x, y) {
+	m_Rect.setTexture(TextureManager::GetTexture("mine"));
 }
 
 void Mine::OnUpdate(float deltaTime) {

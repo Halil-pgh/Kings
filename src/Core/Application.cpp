@@ -8,6 +8,7 @@
 #include "UI/ServerList.h"
 #include "UI/TextInput.h"
 #include "SceneManager.h"
+#include "TextureManager.h"
 #include "Random.h"
 
 Application* Application::s_Instance = nullptr;
@@ -18,6 +19,8 @@ Application::Application() {
 	Random::Init();
 	SceneManager::Init();
 	FontManager::SetFont("assets/fonts/arial.ttf");
+	TextureManager::AddTexture("home", "assets/images/home.png");
+	TextureManager::AddTexture("mine", "assets/images/mine.png");
 
 #ifdef WIN32
 	// Just to see console output on debug mode (clion)
