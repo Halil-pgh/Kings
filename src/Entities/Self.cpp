@@ -23,23 +23,43 @@ void Self::OnUpdate(float deltaTime) {
 		m_Text.move(m_Velocity * deltaTime);
 		m_Rect.move(m_Velocity * deltaTime);
 	}
+	else if (m_Mode == Mode::Build) {
+		sf::Vector2f mousePos = Application::GetMousePosition();
+		m_ProductionBuilding->SetPositon(mousePos);
+	}
 
 	FollowMouse();
 	HandleConnection();
 }
 
+void Self::OnDraw(sf::RenderWindow &window) {
+	window.draw(m_Rect);
+	window.draw(m_Text);
+
+	for (auto building : m_Buildings) {
+		building->OnDraw(window);
+	}
+
+	if (m_Mode == Mode::Build) {
+		m_ProductionBuilding->OnDraw(window);
+	}
+}
+
 void Self::OnEvent(const sf::Event& event) {
 	switch (event.type) {
 		case sf::Event::KeyPressed: {
+			sf::Vector2f mousePos = Application::GetMousePosition();
 			switch (event.key.code) {
 				case sf::Keyboard::Q: {
 					m_Mode = Mode::Build;
-					m_BuildType = BuildingType::Home;
+					m_ProductionBuilding = std::make_unique<Home>(mousePos.x, mousePos.y);
+					m_ProductionBuilding->SetProduction(true);
 					break;
 				}
 				case sf::Keyboard::W: {
 					m_Mode = Mode::Build;
-					m_BuildType = BuildingType::Mine;
+					m_ProductionBuilding = std::make_unique<Mine>(mousePos.x, mousePos.y);
+					m_ProductionBuilding->SetProduction(true);
 					break;
 				}
 				default: {
@@ -51,17 +71,9 @@ void Self::OnEvent(const sf::Event& event) {
 		case sf::Event::MouseButtonPressed: {
 			if (event.mouseButton.button == sf::Mouse::Button::Left) {
 				if (m_Mode == Mode::Build) {
-					sf::Vector2f mousePos = Application::GetMousePosition();
-					switch (m_BuildType) {
-						case BuildingType::Home: {
-							m_Buildings.push_back(new Home(mousePos.x, mousePos.y));
-							break;
-						}
-						case BuildingType::Mine: {
-							m_Buildings.push_back(new Mine(mousePos.x, mousePos.y));
-							break;
-						}
-					}
+					auto newBuilding = new Building(*m_ProductionBuilding.get());
+					newBuilding->SetProduction(false);
+					m_Buildings.push_back(newBuilding);
 					m_Mode = Mode::Walk;
 				}
 			}
@@ -190,3 +202,4 @@ Server* Self::GetServer() {
 	std::cout << "Server is null!\n";
 	return nullptr;
 }
+

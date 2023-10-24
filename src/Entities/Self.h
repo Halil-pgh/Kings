@@ -15,6 +15,7 @@ public:
 	~Self() override;
 
 	void OnUpdate(float deltaTime) override;
+	void OnDraw(sf::RenderWindow& window) override;
 	void OnEvent(const sf::Event& event) override;
 
 	void BecomeServer(const std::string& serverName);
@@ -29,7 +30,7 @@ private:
 
 private:
 	Mode m_Mode = Mode::Walk;
-	BuildingType m_BuildType;
+	std::unique_ptr<Building> m_ProductionBuilding;
 
 private:
 	float m_Speed;
