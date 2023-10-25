@@ -31,6 +31,7 @@ Application::Application() {
 Application::~Application() {
 	SceneManager::Destroy();
 	FontManager::Destroy();
+	TextureManager::Destroy();
 }
 
 void Application::Run() {

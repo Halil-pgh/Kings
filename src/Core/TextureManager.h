@@ -3,6 +3,8 @@
 class TextureManager {
 public:
 	static TextureManager* Get();
+	static void Destroy();
+
 	static void AddTexture(const std::string& name, const std::string& texturePath);
 	static sf::Texture* GetTexture(const std::string& name);
 

@@ -17,7 +17,7 @@ Self::~Self() {
 }
 
 void Self::OnUpdate(float deltaTime) {
-	Application::Get()->GetCamera().setCenter(m_Rect.getPosition() + sf::Vector2f{m_Rect.getSize().x / 2, m_Rect.getSize().y / 2});
+	Application::Get()->GetCamera().setCenter((sf::Vector2f)sf::Vector2i(m_Rect.getPosition() + sf::Vector2f{m_Rect.getSize().x / 2, m_Rect.getSize().y / 2}));
 
 	if (m_Mode == Mode::Walk) {
 		m_Text.move(m_Velocity * deltaTime);
@@ -25,7 +25,7 @@ void Self::OnUpdate(float deltaTime) {
 	}
 	else if (m_Mode == Mode::Build) {
 		sf::Vector2f mousePos = Application::GetMousePosition();
-		m_ProductionBuilding->SetPositon(mousePos);
+		m_ProductionBuilding->SetPosition(mousePos);
 	}
 
 	FollowMouse();
@@ -41,6 +41,7 @@ void Self::OnDraw(sf::RenderWindow &window) {
 	}
 
 	if (m_Mode == Mode::Build) {
+		m_ProductionBuilding->SetProductable(CheckBuildingsForProduction());
 		m_ProductionBuilding->OnDraw(window);
 	}
 }
@@ -62,6 +63,12 @@ void Self::OnEvent(const sf::Event& event) {
 					m_ProductionBuilding->SetProduction(true);
 					break;
 				}
+				case sf::Keyboard::Escape: {
+					if (m_Mode == Mode::Build) {
+						m_Mode = Mode::Walk;
+					}
+					break;
+				}
 				default: {
 					break;
 				}
@@ -71,10 +78,20 @@ void Self::OnEvent(const sf::Event& event) {
 		case sf::Event::MouseButtonPressed: {
 			if (event.mouseButton.button == sf::Mouse::Button::Left) {
 				if (m_Mode == Mode::Build) {
-					auto newBuilding = new Building(*m_ProductionBuilding.get());
+					m_Mode = Mode::Walk;
+					if (!CheckBuildingsForProduction()) {
+						break;
+					}
+
+					Building* newBuilding;
+					if (auto home = dynamic_cast<Home*>(m_ProductionBuilding.get()); home != nullptr) {
+						newBuilding = new Home(*home);
+					}
+					else if (auto mine = dynamic_cast<Mine*>(m_ProductionBuilding.get()); mine != nullptr) {
+						newBuilding = new Mine(*mine);
+					}
 					newBuilding->SetProduction(false);
 					m_Buildings.push_back(newBuilding);
-					m_Mode = Mode::Walk;
 				}
 			}
 			break;
@@ -93,7 +110,7 @@ void Self::HandleConnection() {
 			buildingData.push_back({
 				BuildingType::Mine,
 				building->GetPosition()
-		   });
+			});
 		}
 		else if (dynamic_cast<Home*>(building) != nullptr) {
 			buildingData.push_back({
@@ -202,3 +219,18 @@ Server* Self::GetServer() {
 	return nullptr;
 }
 
+bool Self::CheckBuildingsForProduction() {
+	bool result = std::ranges::all_of(m_Buildings, [&](auto building) {
+		return !m_ProductionBuilding->GetRectangle().intersects(building->GetRectangle());
+	});
+
+	for (auto player : m_OtherPlayers) {
+		for (auto building : player->m_Buildings) {
+			if (m_ProductionBuilding->GetRectangle().intersects(building->GetRectangle())) {
+				return false;
+			}
+		}
+	}
+
+	return result;
+}

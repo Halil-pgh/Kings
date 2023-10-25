@@ -23,4 +23,7 @@ protected:
 	sf::Vector2f m_Velocity;
 
 	std::vector<Building*> m_Buildings;
+
+	// Don't know why I need it anyway
+	friend class Self;
 };

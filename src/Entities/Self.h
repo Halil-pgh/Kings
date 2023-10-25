@@ -27,6 +27,7 @@ public:
 private:
 	void FollowMouse();
 	void HandleConnection();
+	bool CheckBuildingsForProduction();
 
 private:
 	Mode m_Mode = Mode::Walk;

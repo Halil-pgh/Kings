@@ -11,6 +11,10 @@ TextureManager* TextureManager::Get() {
 	return s_Instance;
 }
 
+void TextureManager::Destroy() {
+	delete s_Instance;
+}
+
 void TextureManager::AddTexture(const std::string &name, const std::string &texturePath) {
 	sf::Texture texture;
 	if (!texture.loadFromFile(texturePath)) {
@@ -18,7 +22,7 @@ void TextureManager::AddTexture(const std::string &name, const std::string &text
 		assert(false);
 	}
 
-	Get()->m_Textures[name] = std::move(texture);
+	Get()->m_Textures[name] = texture;
 }
 
 sf::Texture* TextureManager::GetTexture(const std::string &name) {

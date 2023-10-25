@@ -4,7 +4,7 @@
 
 Mine::Mine(float x, float y)
 	: Building(x, y) {
-	m_Rect.setTexture(TextureManager::GetTexture("mine"));
+	m_Rect.setTexture(TextureManager::GetTexture(TextureName()));
 }
 
 void Mine::OnUpdate(float deltaTime) {
@@ -13,4 +13,8 @@ void Mine::OnUpdate(float deltaTime) {
 
 void Mine::OnEvent(const sf::Event &event) {
 
+}
+
+std::string Mine::TextureName() {
+	return "mine";
 }
