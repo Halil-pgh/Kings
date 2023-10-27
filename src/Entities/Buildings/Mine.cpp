@@ -18,3 +18,7 @@ void Mine::OnEvent(const sf::Event &event) {
 std::string Mine::TextureName() {
 	return "mine";
 }
+
+unsigned int Mine::MoneyPerSecond() {
+	return 1;
+}

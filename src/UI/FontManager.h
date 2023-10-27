@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics/Font.hpp>
+#include <unordered_map>
 #include <iostream>
 
 class FontManager {
@@ -15,15 +16,15 @@ public:
 		delete s_Instance;
 	}
 
-	static void SetFont(const std::string& fileName) {
-		if (!Get()->m_Font.loadFromFile(fileName)) {
+	static void SetFont(const std::string& name, const std::string& fileName) {
+		if (!Get()->m_Fonts[name].loadFromFile(fileName)) {
 			std::cout << "Failed to load font from file: " << fileName << "!\n";
 			exit(-1);
 		}
 	}
 
-	inline static const sf::Font& GetFont() {
-		return Get()->m_Font;
+	inline static const sf::Font& GetFont(const std::string& name) {
+		return Get()->m_Fonts[name];
 	}
 
 private:
@@ -31,7 +32,7 @@ private:
 
 private:
 	static FontManager* s_Instance;
-	sf::Font m_Font;
+	std::unordered_map<std::string, sf::Font> m_Fonts;
 };
 
 inline FontManager* FontManager::s_Instance;

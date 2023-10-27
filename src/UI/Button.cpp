@@ -11,13 +11,15 @@ Button::Button(float x, float y, float width, float height, const std::string& m
 	m_Rect.setPosition(x, y);
 	m_Rect.setSize({ width, height });
 
-	m_Text.setFont(FontManager::GetFont());
+	m_Text.setFont(FontManager::GetFont("normal"));
 	m_Text.setString(mess);
 	m_Text.setCharacterSize(18);
 
-	m_Text.setPosition((m_Rect.getPosition().x + (m_Rect.getSize().x - m_Text.getLocalBounds().width) / 2),
-					   (m_Rect.getPosition().y + (m_Rect.getSize().y - m_Text.getLocalBounds().height) / 2));
+	m_Text.setPosition((float)(int)(m_Rect.getPosition().x + (m_Rect.getSize().x - m_Text.getLocalBounds().width) / 2),
+					   (float)(int)(m_Rect.getPosition().y + (m_Rect.getSize().y - m_Text.getLocalBounds().height) / 2));
 	m_Text.setFillColor(sf::Color::Black);
+
+	m_Text.setStyle(sf::Text::Regular);
 }
 
 void Button::OnUpdate(float deltaTime) {

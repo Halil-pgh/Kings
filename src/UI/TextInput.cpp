@@ -6,8 +6,8 @@
 
 #define MID_POS_X (m_Rect.getPosition().x + m_Rect.getSize().x / 2)
 #define MID_POS_Y (m_Rect.getPosition().y + m_Rect.getSize().y / 2)
-#define TEXT_POS_X(text) (MID_POS_X - text.getLocalBounds().width / 2)
-#define TEXT_POS_Y(text) (MID_POS_Y - text.getLocalBounds().height / 2)
+#define TEXT_POS_X(text) (int)(MID_POS_X - text.getLocalBounds().width / 2)
+#define TEXT_POS_Y(text) (int)(MID_POS_Y - text.getLocalBounds().height / 2)
 #define CURSOR_POS_X (MID_POS_X + m_Text.getLocalBounds().width / 2)
 #define CURSOR_POS_Y (MID_POS_Y - m_Text.getLocalBounds().height / 2)
 
@@ -20,13 +20,13 @@ TextInput::TextInput(float x, float y, float width, float height, const std::str
 	m_Cursor.setSize({ 2, 18 });
 	m_Cursor.setFillColor(sf::Color::Black);
 
-	m_Text.setFont(FontManager::GetFont());
+	m_Text.setFont(FontManager::GetFont("normal"));
 	m_Text.setString(m_Input);
 	m_Text.setCharacterSize(18);
 	m_Text.setPosition(TEXT_POS_X(m_Text), TEXT_POS_Y(m_Text));
 	m_Text.setFillColor(sf::Color::Black);
 
-	m_DefaultText.setFont(FontManager::GetFont());
+	m_DefaultText.setFont(FontManager::GetFont("normal"));
 	m_DefaultText.setString(defaultText);
 	m_DefaultText.setCharacterSize(18);
 	m_DefaultText.setPosition(TEXT_POS_X(m_DefaultText), TEXT_POS_Y(m_DefaultText));

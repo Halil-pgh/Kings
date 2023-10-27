@@ -10,4 +10,6 @@ public:
 	void OnEvent(const sf::Event &event) override;
 
 	std::string TextureName() final;
+
+	unsigned int GetMaxCount();
 };

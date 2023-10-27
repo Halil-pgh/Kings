@@ -11,15 +11,16 @@
 
 Player::Player()
 	: m_Velocity(0, 0) {
-	m_Rect.setPosition(100, 100);
+	m_Rect.setPosition(0, 0);
 	m_Rect.setSize({ 50, 50 });
 	m_Rect.setOrigin(m_Rect.getSize().x / 2, m_Rect.getSize().y / 2);
 	m_Rect.setFillColor(sf::Color(Random::GenerateInt(0, 256), Random::GenerateInt(0, 256), Random::GenerateInt(0, 256)));
 
-	m_Text.setFont(FontManager::GetFont());
+	m_Text.setFont(FontManager::GetFont("normal"));
 	m_Text.setString("None");
 	m_Text.setCharacterSize(18);
 	m_Text.setPosition(TEXT_POS_X, TEXT_POS_Y);
+	m_Text.setStyle(sf::Text::Regular);
 }
 
 void Player::OnDraw(sf::RenderWindow& window) {

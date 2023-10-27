@@ -19,3 +19,7 @@ void Home::OnEvent(const sf::Event &event) {
 std::string Home::TextureName() {
 	return "home";
 }
+
+unsigned int Home::GetMaxCount() {
+	return 10;
+}

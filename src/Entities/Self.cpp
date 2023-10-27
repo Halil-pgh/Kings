@@ -7,9 +7,23 @@
 #include "Networking/Client.h"
 #include "Core/SceneManager.h"
 #include "Core/Application.h"
+#include "UI/FontManager.h"
 
 Self::Self()
 	: m_Speed(100), m_Networker(nullptr) {
+	m_MoneyText.setFont(FontManager::GetFont("normal"));
+	m_MoneyText.setCharacterSize(24);
+	m_MoneyText.setString(L"🪙");
+	m_MoneyText.setPosition(-100, -100);
+	m_MoneyText.setFillColor(sf::Color::White);
+	m_MoneyText.setStyle(sf::Text::Regular);
+
+	m_MaxSoldierText.setFont(FontManager::GetFont("normal"));
+	m_MaxSoldierText.setString("Max Soldier Count: " + std::to_string(m_MaxSoldier));
+	m_MaxSoldierText.setCharacterSize(24);
+	m_MaxSoldierText.setPosition(0, -Application::Get()->GetWindowBase().getSize().y / 2 + 200);
+	m_MaxSoldierText.setFillColor(sf::Color::White);
+	m_MaxSoldierText.setStyle(sf::Text::Regular);
 }
 
 Self::~Self() {
@@ -22,10 +36,20 @@ void Self::OnUpdate(float deltaTime) {
 	if (m_Mode == Mode::Walk) {
 		m_Text.move(m_Velocity * deltaTime);
 		m_Rect.move(m_Velocity * deltaTime);
+		m_MoneyText.move(m_Velocity * deltaTime);
+		m_MaxSoldierText.move(m_Velocity * deltaTime);
 	}
 	else if (m_Mode == Mode::Build) {
 		sf::Vector2f mousePos = Application::GetMousePosition();
 		m_ProductionBuilding->SetPosition(mousePos);
+	}
+
+	// Updating money $$$
+	m_MoneyTime += deltaTime;
+	if (m_MoneyTime >= 1) {
+		m_Money += m_MoneyPerSecond;
+		m_MoneyText.setString(L"🪙");
+		m_MoneyTime = 0;
 	}
 
 	FollowMouse();
@@ -44,6 +68,9 @@ void Self::OnDraw(sf::RenderWindow &window) {
 		m_ProductionBuilding->SetProductable(CheckBuildingsForProduction());
 		m_ProductionBuilding->OnDraw(window);
 	}
+
+	window.draw(m_MoneyText);
+	window.draw(m_MaxSoldierText);
 }
 
 void Self::OnEvent(const sf::Event& event) {
@@ -85,10 +112,15 @@ void Self::OnEvent(const sf::Event& event) {
 
 					Building* newBuilding;
 					if (auto home = dynamic_cast<Home*>(m_ProductionBuilding.get()); home != nullptr) {
-						newBuilding = new Home(*home);
+						auto newHome = new Home(*home);
+						m_MaxSoldier += newHome->GetMaxCount();
+						m_MaxSoldierText.setString(std::string("Max Soldier Count: ") + std::to_string(m_MaxSoldier));
+						newBuilding = newHome;
 					}
 					else if (auto mine = dynamic_cast<Mine*>(m_ProductionBuilding.get()); mine != nullptr) {
-						newBuilding = new Mine(*mine);
+						auto newMine = new Mine(*mine);
+						m_MoneyPerSecond += newMine->MoneyPerSecond();
+						newBuilding = newMine;
 					}
 					newBuilding->SetProduction(false);
 					m_Buildings.push_back(newBuilding);
@@ -180,7 +212,8 @@ void Self::BecomeServer(const std::string& serverName) {
 	   m_Name,
 	   m_Rect.getFillColor(),
 	   m_Rect.getPosition(),
-	   m_Rect.getRotation()
+	   m_Rect.getRotation(),
+	   {}
 	});
 	m_JoinedUUIDs.push_back(m_Networker->GetUUID());
 	m_Networker->Run();
@@ -197,7 +230,8 @@ void Self::BecomeClient() {
 	   m_Name,
 	   m_Rect.getFillColor(),
 	   m_Rect.getPosition(),
-	   m_Rect.getRotation()
+	   m_Rect.getRotation(),
+	   {}
 	});
 	m_JoinedUUIDs.push_back(m_Networker->GetUUID());
 	m_Networker->Run();
@@ -224,12 +258,16 @@ bool Self::CheckBuildingsForProduction() {
 		return !m_ProductionBuilding->GetRectangle().intersects(building->GetRectangle());
 	});
 
+	if (!result)
+		return result;
+
 	for (auto player : m_OtherPlayers) {
-		for (auto building : player->m_Buildings) {
-			if (m_ProductionBuilding->GetRectangle().intersects(building->GetRectangle())) {
-				return false;
-			}
-		}
+		result = std::ranges::all_of(player->m_Buildings, [&](auto building) {
+			return !m_ProductionBuilding->GetRectangle().intersects(building->GetRectangle());
+		});
+
+		if (!result)
+			return result;
 	}
 
 	return result;

@@ -18,7 +18,8 @@ Application::Application() {
 	m_Camera = m_Window.getDefaultView();
 	Random::Init();
 	SceneManager::Init();
-	FontManager::SetFont("assets/fonts/arial.ttf");
+	FontManager::SetFont("normal", "assets/fonts/noto-sans/NotoSans-Regular.ttf");
+	FontManager::SetFont("emoji", "assets/fonts/noto-emoji/NotoColorEmoji-Regular.ttf");
 	TextureManager::AddTexture("home", "assets/images/home.png");
 	TextureManager::AddTexture("mine", "assets/images/mine.png");
 

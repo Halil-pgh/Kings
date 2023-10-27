@@ -33,6 +33,14 @@ private:
 	Mode m_Mode = Mode::Walk;
 	std::unique_ptr<Building> m_ProductionBuilding;
 
+	sf::Text m_MaxSoldierText;
+	sf::Text m_MoneyText;
+
+	unsigned int m_MaxSoldier = 0;
+	unsigned int m_MoneyPerSecond = 0;
+	unsigned int m_Money = 0;
+	float m_MoneyTime = 0;
+
 private:
 	float m_Speed;
 	Networker* m_Networker;
