@@ -11,7 +11,7 @@ public:
 	static sf::Vector2f GetMousePosition(const sf::View& base);
 	inline const sf::WindowBase& GetWindowBase() const { return m_Window; }
 	inline bool IsRunning() const { return m_Running; }
-	inline const sf::View& GetDefaultView() { return Get()->m_Window.getDefaultView(); }
+	inline const sf::View& GetDefaultView() { return m_Window.getDefaultView(); }
 
 private:
 	Application();

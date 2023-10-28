@@ -89,7 +89,7 @@ void Scene::OnUpdate(float deltaTime) {
 }
 
 void Scene::OnDraw(sf::RenderWindow& window) {
-	for (uint32_t i = 1; i <= m_Layers.size(); i++)
+	for (uint32_t i = m_Layers.size(); i > 0; i--)
 		m_Layers[i]->OnDraw(window);
 }
 

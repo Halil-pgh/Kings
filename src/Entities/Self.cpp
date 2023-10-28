@@ -8,6 +8,7 @@
 #include "Core/SceneManager.h"
 #include "Core/Application.h"
 #include "UI/FontManager.h"
+#include "UI/Options.h"
 
 #define WINDOW_SIZE (float)Application::Get()->GetWindowBase().getSize()
 
@@ -77,6 +78,12 @@ bool Self::OnEvent(const sf::Event& event) {
 					m_Mode = Mode::Build;
 					m_ProductionBuilding = std::make_unique<Mine>(mousePos.x, mousePos.y);
 					m_ProductionBuilding->SetProduction(true);
+					return true;
+				}
+				case sf::Keyboard::S: {
+					SceneManager::GetActiveScene()->AddLayer("Menu", 1);
+					auto options = new Options();
+					SceneManager::GetActiveScene()->GetLayer("Menu")->AddEntity(options);
 					return true;
 				}
 				case sf::Keyboard::Escape: {
