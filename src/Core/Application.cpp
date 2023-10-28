@@ -36,10 +36,10 @@ Application::~Application() {
 
 void Application::Run() {
 	auto self = new Self();
-	auto textInput = new TextInput((float)GetWindowBase().getSize().x / 3, 150, (float)GetWindowBase().getSize().x / 3, 50, "Enter your name");
+	auto textInput = new TextInput((float)GetWindowBase().getSize().x / 3, 3.0f * (float)GetWindowBase().getSize().y / 12, (float)GetWindowBase().getSize().x / 3, 50, "Enter your name");
 	auto serverList = new ServerList();
 
-	auto createButton = new Button((float)GetWindowBase().getSize().x / 6, 400, 200, 50, "Create Game");
+	auto createButton = new Button(2.0f * (float)GetWindowBase().getSize().x / 12, 7.0f * (float)GetWindowBase().getSize().y / 12, 2.0f * (float)GetWindowBase().getSize().x / 12, 50, "Create Game");
 	createButton->SetOnClickCallback([&]() {
 		if (textInput->Get().empty())
 			return;
@@ -49,7 +49,7 @@ void Application::Run() {
 		SceneManager::SetActiveScene("Game");
 	});
 
-	auto joinButton = new Button((float)7 * (float)GetWindowBase().getSize().x / 12, 400, 200, 50, "Join Game");
+	auto joinButton = new Button(8.0f * (float)GetWindowBase().getSize().x / 12, 7.0f * (float)GetWindowBase().getSize().y / 12, 2.0f * (float)GetWindowBase().getSize().x / 12, 50, "Join Game");
 	joinButton->SetOnClickCallback([&]() {
 		if (textInput->Get().empty())
 			return;

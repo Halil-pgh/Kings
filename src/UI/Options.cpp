@@ -2,6 +2,7 @@
 #include "Options.h"
 
 #include "Core/SceneManager.h"
+#include "Core/Application.h"
 #include "FontManager.h"
 
 Options::Options() {
@@ -14,7 +15,9 @@ Options::Options() {
 
 	m_Text.setFont(FontManager::GetFont("normal"));
 	m_Text.setCharacterSize(24);
-	m_Text.setString("Esc to exit :)");
+	m_Text.setString("Esc to exit \n"
+					 "A to close the app \n"
+					 "S to close the server");
 	m_Text.setPosition(10, 100);
 	m_Text.setFillColor(sf::Color::Black);
 	m_Text.setStyle(sf::Text::Regular);
@@ -42,6 +45,14 @@ bool Options::OnEvent(const sf::Event &event) {
 	switch (event.type) {
 		case sf::Event::KeyPressed: {
 			switch (event.key.code) {
+				case sf::Keyboard::A: {
+					Application::Get()->m_Running = false;
+					return true;
+				}
+				case sf::Keyboard::S: {
+					m_OnCloseServer();
+					return true;
+				}
 				case sf::Keyboard::Escape: {
 					m_OnDetach();
 					SceneManager::GetActiveScene()->RemoveLayer("Menu");

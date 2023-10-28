@@ -7,6 +7,7 @@ public:
 	Options();
 
 	inline void OnDetach(const std::function<void()>& func) { m_OnDetach = func; }
+	inline void OnCloseServer(const std::function<void()>& func) { m_OnCloseServer = func; }
 
 	void OnAttach() override;
 	bool OnEvent(const sf::Event &event) override;
@@ -15,6 +16,7 @@ public:
 
 private:
 	std::function<void()> m_OnDetach;
+	std::function<void()> m_OnCloseServer;
 
 	sf::RectangleShape m_Rect;
 	sf::Text m_Heading;

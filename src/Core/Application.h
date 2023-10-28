@@ -22,5 +22,7 @@ private:
 
 	sf::RenderWindow m_Window;
 	bool m_Running = true;
+
+	friend class Options;
 };
 

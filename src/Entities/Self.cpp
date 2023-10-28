@@ -83,19 +83,24 @@ bool Self::OnEvent(const sf::Event& event) {
 					m_ProductionBuilding->SetProduction(true);
 					return true;
 				}
-				case sf::Keyboard::S: {
-					m_Mode = Mode::Settings;
-					SceneManager::GetActiveScene()->AddLayer("Menu", 1);
-					auto options = new Options();
-					options->OnDetach([&]() {
-						m_Mode = Mode::Walk;
-					});
-					SceneManager::GetActiveScene()->GetLayer("Menu")->AddEntity(options);
-					return true;
-				}
 				case sf::Keyboard::Escape: {
 					if (m_Mode == Mode::Build) {
 						m_Mode = Mode::Walk;
+					}
+					else {
+						m_Mode = Mode::Settings;
+						SceneManager::GetActiveScene()->AddLayer("Menu", 1);
+						auto options = new Options();
+						options->OnDetach([&]() {
+							m_Mode = Mode::Walk;
+						});
+						options->OnCloseServer([&]() {
+							SceneManager::SetActiveScene("Main");
+							m_Networker->ShoutDown();
+							delete m_Networker;
+							m_Networker = nullptr;
+						});
+						SceneManager::GetActiveScene()->GetLayer("Menu")->AddEntity(options);
 					}
 					return true;
 				}

@@ -18,6 +18,8 @@ Client::Client() {
 }
 
 Client::~Client() {
+	m_Socket.unbind();
+
 	m_Running = false;
 	if (m_Thread.joinable()) {
 		m_Thread.join();

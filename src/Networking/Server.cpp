@@ -3,7 +3,6 @@
 
 #include <cassert>
 #include <utility>
-#include "Core/Application.h"
 #include "Data/Types.h"
 #include "Data/Connections.h"
 #include "Data/ServerData.h"
@@ -28,6 +27,8 @@ Server::Server(std::string name)
 }
 
 Server::~Server() {
+	m_Socket.unbind();
+
 	m_Running = false;
 	if (m_Thread.joinable())
 		m_Thread.join();

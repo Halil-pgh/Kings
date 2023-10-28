@@ -28,6 +28,8 @@ void ServerList::SetBackScene(const std::string& name) {
 	m_BackButton.SetOnClickCallback([&, name]() {
 		SceneManager::SetActiveScene(name);
 		m_Client->ShoutDown();
+		delete m_Client;
+		m_Client = nullptr;
 	});
 }
 
