@@ -2,12 +2,14 @@
 
 #include "Player.h"
 #include "UI/PlayerStats.h"
+#include "UI/ShopBar.h"
 #include "Networking/Client.h"
 #include "Networking/Server.h"
 
 enum class Mode {
 	Walk,
-	Build
+	Build,
+	Settings
 };
 
 class Self : public Player {
@@ -35,6 +37,7 @@ private:
 	Mode m_Mode = Mode::Walk;
 	std::unique_ptr<Building> m_ProductionBuilding;
 
+	ShopBar* m_ShopBar;
 	PlayerStats* m_PlayerStats;
 	unsigned int m_MaxSoldier = 0;
 	unsigned int m_MoneyPerSecond = 0;

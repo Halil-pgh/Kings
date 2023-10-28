@@ -43,7 +43,8 @@ bool Options::OnEvent(const sf::Event &event) {
 		case sf::Event::KeyPressed: {
 			switch (event.key.code) {
 				case sf::Keyboard::Escape: {
-					SceneManager::GetActiveScene()->GetLayer("Menu")->RemoveEntity(this);
+					m_OnDetach();
+					SceneManager::GetActiveScene()->RemoveLayer("Menu");
 					return true;
 				}
 				default: {

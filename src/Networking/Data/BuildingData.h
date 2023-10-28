@@ -1,11 +1,7 @@
 #pragma once
 
 #include "PacketUtils.h"
-
-enum class BuildingType {
-	Home,
-	Mine
-};
+#include "Entities/Buildings/Building.h"
 
 struct BuildingData {
 	BuildingType type;

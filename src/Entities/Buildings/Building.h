@@ -1,11 +1,17 @@
 #pragma once
 
-#include "Networking/Data/BuildingData.h"
 #include "Entities/Entity.h"
+
+enum class BuildingType {
+	Home,
+	Mine,
+
+	Count // <- This is count, do not use that for BuildingType
+};
 
 class Building : public Entity {
 public:
-	Building(float x, float y);
+	Building(float x, float y, BuildingType type);
 	~Building() override = default;
 
 	void OnAttach() override {}
@@ -16,6 +22,7 @@ public:
 	virtual std::string TextureName() = 0;
 
 	inline sf::FloatRect GetRectangle() const { return m_Rect.getGlobalBounds(); }
+	inline BuildingType GetType() const { return m_Type; }
 	inline const sf::Vector2f& GetPosition() const { return m_Rect.getPosition(); }
 	inline void SetPosition(const sf::Vector2f& position) { m_Rect.setPosition(position); }
 
@@ -23,6 +30,7 @@ public:
 	void SetProductable(bool productable);
 
 protected:
+	BuildingType m_Type;
 	sf::RectangleShape m_Rect;
 	bool m_IsProductable = true;
 	sf::Texture* m_UnproductableTexture = nullptr;

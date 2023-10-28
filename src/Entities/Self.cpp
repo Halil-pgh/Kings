@@ -13,7 +13,7 @@
 #define WINDOW_SIZE (float)Application::Get()->GetWindowBase().getSize()
 
 Self::Self()
-	: m_Speed(100), m_Networker(nullptr), m_PlayerStats(new PlayerStats()) {
+	: m_Speed(100), m_Networker(nullptr), m_PlayerStats(new PlayerStats()), m_ShopBar(new ShopBar()) {
 }
 
 Self::~Self() {
@@ -22,11 +22,12 @@ Self::~Self() {
 
 void Self::OnAttach() {
 	SceneManager::GetScene("Game")->GetLayer("UI")->AddEntity(m_PlayerStats);
+	SceneManager::GetScene("Game")->GetLayer("UI")->AddEntity(m_ShopBar);
 }
 
 void Self::OnUpdate(float deltaTime) {
 	sf::View& camera = SceneManager::GetActiveScene()->GetLayer("Game")->GetView();
-	camera.setCenter((sf::Vector2f)sf::Vector2i(m_Rect.getPosition() + sf::Vector2f{m_Rect.getSize().x / 2, m_Rect.getSize().y / 2}));
+	camera.setCenter((sf::Vector2f)sf::Vector2i(m_Rect.getPosition()));
 
 	if (m_Mode == Mode::Walk) {
 		m_Text.move(m_Velocity * deltaTime);
@@ -50,6 +51,8 @@ void Self::OnUpdate(float deltaTime) {
 }
 
 void Self::OnDraw(sf::RenderWindow &window) {
+	window.clear(sf::Color(82, 115, 6));
+
 	window.draw(m_Rect);
 	window.draw(m_Text);
 
@@ -81,8 +84,12 @@ bool Self::OnEvent(const sf::Event& event) {
 					return true;
 				}
 				case sf::Keyboard::S: {
+					m_Mode = Mode::Settings;
 					SceneManager::GetActiveScene()->AddLayer("Menu", 1);
 					auto options = new Options();
+					options->OnDetach([&]() {
+						m_Mode = Mode::Walk;
+					});
 					SceneManager::GetActiveScene()->GetLayer("Menu")->AddEntity(options);
 					return true;
 				}
@@ -107,14 +114,14 @@ bool Self::OnEvent(const sf::Event& event) {
 						}
 
 						Building* newBuilding;
-						if (auto home = dynamic_cast<Home*>(m_ProductionBuilding.get()); home != nullptr) {
-							auto newHome = new Home(*home);
+						if (m_ProductionBuilding->GetType() == BuildingType::Home) {
+							auto newHome = new Home(*(Home*)m_ProductionBuilding.get());
 							m_MaxSoldier += newHome->GetMaxCount();
 							m_PlayerStats->SetMaxSoldierCount(m_MaxSoldier);
 							newBuilding = newHome;
 						}
-						else if (auto mine = dynamic_cast<Mine*>(m_ProductionBuilding.get()); mine != nullptr) {
-							auto newMine = new Mine(*mine);
+						else if (m_ProductionBuilding->GetType() == BuildingType::Mine) {
+							auto newMine = new Mine(*(Mine*)m_ProductionBuilding.get());
 							m_MoneyPerSecond += newMine->MoneyPerSecond();
 							newBuilding = newMine;
 						}
@@ -139,18 +146,10 @@ void Self::HandleConnection() {
 	// TODO: I have to do that better way :/
 	std::vector<BuildingData> buildingData(m_Buildings.size());
 	for (auto building : m_Buildings) {
-		if (dynamic_cast<Mine*>(building) != nullptr) {
-			buildingData.push_back({
-				BuildingType::Mine,
-				building->GetPosition()
-			});
-		}
-		else if (dynamic_cast<Home*>(building) != nullptr) {
-			buildingData.push_back({
-				BuildingType::Home,
-				building->GetPosition()
-			});
-		}
+		buildingData.push_back({
+			building->GetType(),
+			building->GetPosition()
+		});
 	}
 
 	m_Networker->SetPlayerData({

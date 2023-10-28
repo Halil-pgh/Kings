@@ -3,7 +3,7 @@
 #include "Core/TextureManager.h"
 
 Mine::Mine(float x, float y)
-	: Building(x, y) {
+	: Building(x, y, BuildingType::Mine) {
 	m_Rect.setTexture(TextureManager::GetTexture(TextureName()));
 }
 

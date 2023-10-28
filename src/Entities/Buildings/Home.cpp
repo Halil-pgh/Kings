@@ -4,7 +4,7 @@
 #include "Core/TextureManager.h"
 
 Home::Home(float x, float y)
-	:Building(x, y) {
+	:Building(x, y, BuildingType::Home) {
 	m_Rect.setTexture(TextureManager::GetTexture(TextureName()));
 }
 
