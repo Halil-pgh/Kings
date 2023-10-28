@@ -81,11 +81,15 @@ void ServerList::OnDraw(sf::RenderWindow& window) {
 		button.OnDraw(window);
 }
 
-void ServerList::OnEvent(const sf::Event& event) {
-	m_BackButton.OnEvent(event);
-	m_RefreshButton.OnEvent(event);
-	m_JoinButton.OnEvent(event);
+bool ServerList::OnEvent(const sf::Event& event) {
+	if (m_BackButton.OnEvent(event)) return true;
+	if (m_RefreshButton.OnEvent(event)) return true;
+	if (m_JoinButton.OnEvent(event)) return true;
 
-	for (Button& button : m_ServerButtons)
-		button.OnEvent(event);
+	for (Button& button : m_ServerButtons) {
+		if (button.OnEvent(event)) {
+			return true;
+		}
+	}
+	return false;
 }

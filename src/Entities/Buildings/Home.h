@@ -7,7 +7,7 @@ public:
 	Home(float x, float y);
 
 	void OnUpdate(float deltaTime) override;
-	void OnEvent(const sf::Event &event) override;
+	bool OnEvent(const sf::Event &event) override;
 
 	std::string TextureName() final;
 

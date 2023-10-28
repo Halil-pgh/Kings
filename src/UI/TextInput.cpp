@@ -52,7 +52,7 @@ void TextInput::OnDraw(sf::RenderWindow& window) {
 		window.draw(m_DefaultText);
 }
 
-void TextInput::OnEvent(const sf::Event& event) {
+bool TextInput::OnEvent(const sf::Event& event) {
 	if (m_TakeInput) {
 		if (event.type == sf::Event::TextEntered) {
 			// Backspace (I couldn't find a const for backspace unicode)
@@ -70,10 +70,15 @@ void TextInput::OnEvent(const sf::Event& event) {
 				m_Text.setPosition(TEXT_POS_X(m_Text), TEXT_POS_Y(m_Text));
 				m_Cursor.setPosition(CURSOR_POS_X, CURSOR_POS_Y);
 			}
+			return true;
 		}
 	}
-	if (event.type == sf::Event::MouseButtonPressed)
+	if (event.type == sf::Event::MouseButtonPressed) {
 		m_TakeInput = isMouseOn();
+		if (m_TakeInput)
+			return true;
+	}
+	return false;
 }
 
 bool TextInput::isMouseOn()

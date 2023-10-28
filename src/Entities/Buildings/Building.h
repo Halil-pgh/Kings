@@ -8,9 +8,10 @@ public:
 	Building(float x, float y);
 	~Building() override = default;
 
+	void OnAttach() override {}
 	void OnUpdate(float deltaTime) override = 0;
 	void OnDraw(sf::RenderWindow &window) override;
-	void OnEvent(const sf::Event &event) override = 0;
+	bool OnEvent(const sf::Event &event) override = 0;
 
 	virtual std::string TextureName() = 0;
 

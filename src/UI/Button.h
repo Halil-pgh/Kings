@@ -12,9 +12,10 @@ public:
 	inline void SetOnClickCallback(const std::function<void()>& func) { m_OnClick = func; }
 	inline void SetActive(bool active) { m_Active = active; }
 
+	void OnAttach() override {}
 	void OnUpdate(float deltaTime) override;
 	void OnDraw(sf::RenderWindow& window) override;
-	void OnEvent(const sf::Event& event) override;
+	bool OnEvent(const sf::Event& event) override;
 
 private:
 	bool isMouseOn();

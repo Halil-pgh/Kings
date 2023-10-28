@@ -9,38 +9,30 @@
 #include "Core/Application.h"
 #include "UI/FontManager.h"
 
-Self::Self()
-	: m_Speed(100), m_Networker(nullptr) {
-	m_MoneyText.setFont(FontManager::GetFont("normal"));
-	m_MoneyText.setCharacterSize(24);
-	m_MoneyText.setString(L"🪙");
-	m_MoneyText.setPosition(-100, -100);
-	m_MoneyText.setFillColor(sf::Color::White);
-	m_MoneyText.setStyle(sf::Text::Regular);
+#define WINDOW_SIZE (float)Application::Get()->GetWindowBase().getSize()
 
-	m_MaxSoldierText.setFont(FontManager::GetFont("normal"));
-	m_MaxSoldierText.setString("Max Soldier Count: " + std::to_string(m_MaxSoldier));
-	m_MaxSoldierText.setCharacterSize(24);
-	m_MaxSoldierText.setPosition(0, -Application::Get()->GetWindowBase().getSize().y / 2 + 200);
-	m_MaxSoldierText.setFillColor(sf::Color::White);
-	m_MaxSoldierText.setStyle(sf::Text::Regular);
+Self::Self()
+	: m_Speed(100), m_Networker(nullptr), m_PlayerStats(new PlayerStats()) {
 }
 
 Self::~Self() {
 	delete m_Networker;
 }
 
+void Self::OnAttach() {
+	SceneManager::GetScene("Game")->GetLayer("UI")->AddEntity(m_PlayerStats);
+}
+
 void Self::OnUpdate(float deltaTime) {
-	Application::Get()->GetCamera().setCenter((sf::Vector2f)sf::Vector2i(m_Rect.getPosition() + sf::Vector2f{m_Rect.getSize().x / 2, m_Rect.getSize().y / 2}));
+	sf::View& camera = SceneManager::GetActiveScene()->GetLayer("Game")->GetView();
+	camera.setCenter((sf::Vector2f)sf::Vector2i(m_Rect.getPosition() + sf::Vector2f{m_Rect.getSize().x / 2, m_Rect.getSize().y / 2}));
 
 	if (m_Mode == Mode::Walk) {
 		m_Text.move(m_Velocity * deltaTime);
 		m_Rect.move(m_Velocity * deltaTime);
-		m_MoneyText.move(m_Velocity * deltaTime);
-		m_MaxSoldierText.move(m_Velocity * deltaTime);
 	}
 	else if (m_Mode == Mode::Build) {
-		sf::Vector2f mousePos = Application::GetMousePosition();
+		sf::Vector2f mousePos = Application::GetMousePosition(SceneManager::GetActiveScene()->GetLayer("Game")->GetView());
 		m_ProductionBuilding->SetPosition(mousePos);
 	}
 
@@ -48,7 +40,7 @@ void Self::OnUpdate(float deltaTime) {
 	m_MoneyTime += deltaTime;
 	if (m_MoneyTime >= 1) {
 		m_Money += m_MoneyPerSecond;
-		m_MoneyText.setString(L"🪙");
+		m_PlayerStats->SetMoney(m_Money);
 		m_MoneyTime = 0;
 	}
 
@@ -68,68 +60,70 @@ void Self::OnDraw(sf::RenderWindow &window) {
 		m_ProductionBuilding->SetProductable(CheckBuildingsForProduction());
 		m_ProductionBuilding->OnDraw(window);
 	}
-
-	window.draw(m_MoneyText);
-	window.draw(m_MaxSoldierText);
 }
 
-void Self::OnEvent(const sf::Event& event) {
+bool Self::OnEvent(const sf::Event& event) {
 	switch (event.type) {
 		case sf::Event::KeyPressed: {
-			sf::Vector2f mousePos = Application::GetMousePosition();
+			sf::Vector2f mousePos = Application::GetMousePosition(SceneManager::GetActiveScene()->GetLayer("Game")->GetView());
 			switch (event.key.code) {
 				case sf::Keyboard::Q: {
 					m_Mode = Mode::Build;
 					m_ProductionBuilding = std::make_unique<Home>(mousePos.x, mousePos.y);
 					m_ProductionBuilding->SetProduction(true);
-					break;
+					return true;
 				}
 				case sf::Keyboard::W: {
 					m_Mode = Mode::Build;
 					m_ProductionBuilding = std::make_unique<Mine>(mousePos.x, mousePos.y);
 					m_ProductionBuilding->SetProduction(true);
-					break;
+					return true;
 				}
 				case sf::Keyboard::Escape: {
 					if (m_Mode == Mode::Build) {
 						m_Mode = Mode::Walk;
 					}
-					break;
+					return true;
 				}
 				default: {
-					break;
+					return false;
 				}
 			}
-			break;
 		}
 		case sf::Event::MouseButtonPressed: {
-			if (event.mouseButton.button == sf::Mouse::Button::Left) {
-				if (m_Mode == Mode::Build) {
-					m_Mode = Mode::Walk;
-					if (!CheckBuildingsForProduction()) {
-						break;
-					}
+			switch (event.mouseButton.button) {
+				case sf::Mouse::Button::Left: {
+					if (m_Mode == Mode::Build) {
+						m_Mode = Mode::Walk;
+						if (!CheckBuildingsForProduction()) {
+							break;
+						}
 
-					Building* newBuilding;
-					if (auto home = dynamic_cast<Home*>(m_ProductionBuilding.get()); home != nullptr) {
-						auto newHome = new Home(*home);
-						m_MaxSoldier += newHome->GetMaxCount();
-						m_MaxSoldierText.setString(std::string("Max Soldier Count: ") + std::to_string(m_MaxSoldier));
-						newBuilding = newHome;
+						Building* newBuilding;
+						if (auto home = dynamic_cast<Home*>(m_ProductionBuilding.get()); home != nullptr) {
+							auto newHome = new Home(*home);
+							m_MaxSoldier += newHome->GetMaxCount();
+							m_PlayerStats->SetMaxSoldierCount(m_MaxSoldier);
+							newBuilding = newHome;
+						}
+						else if (auto mine = dynamic_cast<Mine*>(m_ProductionBuilding.get()); mine != nullptr) {
+							auto newMine = new Mine(*mine);
+							m_MoneyPerSecond += newMine->MoneyPerSecond();
+							newBuilding = newMine;
+						}
+						newBuilding->SetProduction(false);
+						m_Buildings.push_back(newBuilding);
+						return true;
 					}
-					else if (auto mine = dynamic_cast<Mine*>(m_ProductionBuilding.get()); mine != nullptr) {
-						auto newMine = new Mine(*mine);
-						m_MoneyPerSecond += newMine->MoneyPerSecond();
-						newBuilding = newMine;
-					}
-					newBuilding->SetProduction(false);
-					m_Buildings.push_back(newBuilding);
+					return false;
+				}
+				default: {
+					return false;
 				}
 			}
-			break;
 		}
 		default: {
-			break;
+			return false;
 		}
 	}
 }
@@ -180,14 +174,14 @@ void Self::HandleConnection() {
 		std::cout << "Someone new !\n";
 		std::cout << player.uuid << "\n";
 
-		SceneManager::GetActiveScene()->AddEntity(newPlayer);
+		SceneManager::GetActiveScene()->GetLayer("Game")->AddEntity(newPlayer);
 		m_JoinedUUIDs.push_back(player.uuid);
 		m_OtherPlayers.push_back(newPlayer);
 	}
 }
 
 void Self::FollowMouse() {
-	sf::Vector2f mousePos = Application::GetMousePosition();
+	sf::Vector2f mousePos = Application::GetMousePosition(SceneManager::GetActiveScene()->GetLayer("Game")->GetView());
 	float xdiff = mousePos.x - m_Rect.getPosition().x;
 	float ydiff = mousePos.y - m_Rect.getPosition().y;
 	float radian = atan2f(ydiff, xdiff);

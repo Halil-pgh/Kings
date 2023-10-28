@@ -8,10 +8,10 @@ public:
 	static void Destroy();
 	void Run();
 
-	static sf::Vector2f GetMousePosition();
+	static sf::Vector2f GetMousePosition(const sf::View& base);
 	inline const sf::WindowBase& GetWindowBase() const { return m_Window; }
 	inline bool IsRunning() const { return m_Running; }
-	inline sf::View& GetCamera() { return m_Camera; }
+	inline const sf::View& GetDefaultView() { return Get()->m_Window.getDefaultView(); }
 
 private:
 	Application();
@@ -21,7 +21,6 @@ private:
 	static Application* s_Instance;
 
 	sf::RenderWindow m_Window;
-	sf::View m_Camera;
 	bool m_Running = true;
 };
 

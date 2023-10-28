@@ -11,8 +11,8 @@ void Mine::OnUpdate(float deltaTime) {
 
 }
 
-void Mine::OnEvent(const sf::Event &event) {
-
+bool Mine::OnEvent(const sf::Event &event) {
+	return false;
 }
 
 std::string Mine::TextureName() {

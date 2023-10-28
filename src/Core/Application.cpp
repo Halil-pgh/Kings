@@ -15,7 +15,6 @@ Application* Application::s_Instance = nullptr;
 
 Application::Application() {
 	m_Window.create(sf::VideoMode(1024, 640), "Game");
-	m_Camera = m_Window.getDefaultView();
 	Random::Init();
 	SceneManager::Init();
 	FontManager::SetFont("normal", "assets/fonts/noto-sans/NotoSans-Regular.ttf");
@@ -63,24 +62,27 @@ void Application::Run() {
 	});
 
 	auto gameScene = new Scene("Game");
-	gameScene->AddEntity(self);
+	SceneManager::AddScene(gameScene);
+	gameScene->AddLayer("UI");
+	gameScene->AddLayer("Game");
+	gameScene->GetLayer("Game")->AddEntity(self);
 
 	auto mainScene = new Scene("Main");
-	mainScene->AddEntity(textInput);
-	mainScene->AddEntity(createButton);
-	mainScene->AddEntity(joinButton);
+	SceneManager::AddScene(mainScene);
+	mainScene->AddLayer("UI");
+	mainScene->GetLayer("UI")->AddEntity(textInput);
+	mainScene->GetLayer("UI")->AddEntity(createButton);
+	mainScene->GetLayer("UI")->AddEntity(joinButton);
 
 	auto serverListScene = new Scene("Server List");
-	serverListScene->AddEntity(serverList);
-
-	SceneManager::AddScene(mainScene);
-	SceneManager::AddScene(gameScene);
 	SceneManager::AddScene(serverListScene);
+	serverListScene->AddLayer("UI");
+	serverListScene->GetLayer("UI")->AddEntity(serverList);
 
 	sf::Event event{};
 	sf::Clock clock;
+	SceneManager::SetActiveScene("Main");
 	while (m_Running) {
-		m_Window.setView(m_Camera);
 		SceneManager::GetActiveScene()->OnUpdate(clock.restart().asSeconds());
 
 		m_Window.clear();
@@ -91,6 +93,7 @@ void Application::Run() {
 			if (event.type == sf::Event::Closed) {
 				m_Window.close();
 				m_Running = false;
+				break;
 			}
 
 			SceneManager::GetActiveScene()->OnEvent(event);
@@ -108,11 +111,9 @@ void Application::Destroy() {
 	delete s_Instance;
 }
 
-sf::Vector2f Application::GetMousePosition() {
+sf::Vector2f Application::GetMousePosition(const sf::View& base) {
 	sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(Application::Get()->GetWindowBase()));
-	mousePos.x += Application::Get()->GetCamera().getCenter().x -
-			Application::Get()->GetCamera().getSize().x / 2;
-	mousePos.y += Application::Get()->GetCamera().getCenter().y -
-			Application::Get()->GetCamera().getSize().y / 2;
+	mousePos.x += base.getCenter().x - base.getSize().x / 2;
+	mousePos.y += base.getCenter().y - base.getSize().y / 2;
 	return mousePos;
 }

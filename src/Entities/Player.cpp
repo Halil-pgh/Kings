@@ -32,6 +32,10 @@ void Player::OnDraw(sf::RenderWindow& window) {
 	}
 }
 
+bool Player::OnEvent(const sf::Event &event) {
+	return false;
+}
+
 void Player::SetName(const std::string& name) {
 	m_Name = name;
 	m_Text.setString(name);

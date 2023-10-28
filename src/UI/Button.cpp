@@ -46,17 +46,18 @@ void Button::OnDraw(sf::RenderWindow& window) {
 	window.draw(m_Text);
 }
 
-void Button::OnEvent(const sf::Event& event) {
+bool Button::OnEvent(const sf::Event& event) {
 	if (!m_Active)
-		return;
+		return false;
 
 	switch (event.type) {
 		case sf::Event::MouseButtonPressed: {
 			if (event.mouseButton.button == sf::Mouse::Left && isMouseOn()) {
 				m_Rect.setFillColor(m_PressedColor);
 				m_OnClick();
+				return true;
 			}
-			break;
+			return false;
 		}
 		case sf::Event::MouseButtonReleased: {
 			if (event.mouseButton.button == sf::Mouse::Left) {
@@ -64,11 +65,12 @@ void Button::OnEvent(const sf::Event& event) {
 					m_Rect.setFillColor(m_HighlightedColor);
 				else
 					m_Rect.setFillColor(m_NormalColor);
+				return true;
 			}
-			break;
+			return false;
 		}
 		default:
-			break;
+			return false;
 	}
 }
 

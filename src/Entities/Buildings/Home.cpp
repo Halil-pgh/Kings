@@ -12,8 +12,8 @@ void Home::OnUpdate(float deltaTime) {
 
 }
 
-void Home::OnEvent(const sf::Event &event) {
-
+bool Home::OnEvent(const sf::Event &event) {
+	return false;
 }
 
 std::string Home::TextureName() {

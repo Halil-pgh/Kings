@@ -9,9 +9,10 @@ public:
 	Player();
 	~Player() override = default;
 
+	void OnAttach() override {}
 	void OnUpdate(float deltaTime) override {};
 	void OnDraw(sf::RenderWindow& window) override;
-	void OnEvent(const sf::Event& event) override {};
+	bool OnEvent(const sf::Event& event) override;
 
 	void SetName(const std::string& name);
 	void Reload(const PlayerData& data);

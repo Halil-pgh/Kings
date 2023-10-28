@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Player.h"
+#include "UI/PlayerStats.h"
 #include "Networking/Client.h"
 #include "Networking/Server.h"
 
@@ -14,9 +15,10 @@ public:
 	Self();
 	~Self() override;
 
+	void OnAttach() override;
 	void OnUpdate(float deltaTime) override;
 	void OnDraw(sf::RenderWindow& window) override;
-	void OnEvent(const sf::Event& event) override;
+	bool OnEvent(const sf::Event& event) override;
 
 	void BecomeServer(const std::string& serverName);
 	void BecomeClient();
@@ -33,9 +35,7 @@ private:
 	Mode m_Mode = Mode::Walk;
 	std::unique_ptr<Building> m_ProductionBuilding;
 
-	sf::Text m_MaxSoldierText;
-	sf::Text m_MoneyText;
-
+	PlayerStats* m_PlayerStats;
 	unsigned int m_MaxSoldier = 0;
 	unsigned int m_MoneyPerSecond = 0;
 	unsigned int m_Money = 0;

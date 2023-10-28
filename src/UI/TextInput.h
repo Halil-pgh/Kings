@@ -6,9 +6,10 @@ class TextInput : public Entity {
 public:
 	TextInput(float x, float y, float width, float height, const std::string& defaultText = "");
 
+	void OnAttach() override {}
 	void OnUpdate(float deltaTime) override;
 	void OnDraw(sf::RenderWindow& window) override;
-	void OnEvent(const sf::Event& event) override;
+	bool OnEvent(const sf::Event& event) override;
 
 	std::string Get();
 
