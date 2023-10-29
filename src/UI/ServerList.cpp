@@ -19,48 +19,54 @@ ServerList::ServerList()
 		WINDOW_SIZE.x / (COLUMNS * 2), WINDOW_SIZE.y / (ROWS * 2), "Join") {
 	m_JoinButton.SetActive(false);
 	m_JoinButton.SetOnClickCallback([&]() {
-		m_Client->JoinServer(m_SelectedServerInfo);
+		(*m_Client)->JoinServer(m_SelectedServerInfo);
+		if (SceneManager::GetScene("Game") == nullptr)
+			Application::Get()->CreateGameScene();
 		SceneManager::SetActiveScene("Game");
+		Application::Get()->DestroyServerList();
 	});
 }
 
 void ServerList::SetBackScene(const std::string& name) {
 	m_BackButton.SetOnClickCallback([&, name]() {
+		m_JoinButton.SetActive(false);
+		m_SelectedServerInfo = {};
+
 		SceneManager::SetActiveScene(name);
-		m_Client->ShoutDown();
-		delete m_Client;
-		m_Client = nullptr;
+		delete (*m_Client);
+		(*m_Client) = nullptr;
+		Application::Get()->DestroyServerList();
 	});
 }
 
-void ServerList::SetClient(Client* client) {
+void ServerList::SetClient(Client** client) {
 	m_Client = client;
-	m_Client->RefreshServers();
+	(*m_Client)->RefreshServers();
 	m_RefreshButton.SetOnClickCallback([&]() {
-		m_Client->RefreshServers();
+		(*m_Client)->RefreshServers();
 	});
 }
 
 void ServerList::OnUpdate(float deltaTime) {
-	for (int i = 0; i < m_Client->m_ServerInfos.size(); i++) {
+	for (int i = 0; i < (*m_Client)->m_ServerInfos.size(); i++) {
 		bool here = false;
 		for (ServerInfo& knownInfo : m_ServerInfos) {
-			if (m_Client->m_ServerInfos[i] == knownInfo) {
+			if ((*m_Client)->m_ServerInfos[i] == knownInfo) {
 				here = true;
 				break;
 			}
 		}
 
 		if (!here) {
-			m_ServerInfos.push_back(m_Client->m_ServerInfos[i]);
+			m_ServerInfos.push_back((*m_Client)->m_ServerInfos[i]);
 			auto fi = (float)i;
 			Button button = {
 				(float)WINDOW_SIZE.x / 4, LIST_PADDING + fi * (LIST_PADDING + SERVER_CART_HEIGHT),
-				(float)WINDOW_SIZE.x / 2, SERVER_CART_HEIGHT, "Name: " + m_Client->m_ServerInfos[i].name + ", Player Count: " + std::to_string(m_Client->m_ServerInfos[i].playerCount)
+				(float)WINDOW_SIZE.x / 2, SERVER_CART_HEIGHT, "Name: " + (*m_Client)->m_ServerInfos[i].name + ", Player Count: " + std::to_string((*m_Client)->m_ServerInfos[i].playerCount)
 			};
-			button.SetOnClickCallback([i, this]() {
+			button.SetOnClickCallback([&, i]() {
 				m_JoinButton.SetActive(true);
-				m_SelectedServerInfo = m_Client->m_ServerInfos[i];
+				m_SelectedServerInfo = (*m_Client)->m_ServerInfos[i];
 			});
 			m_ServerButtons.push_back(button);
 		}

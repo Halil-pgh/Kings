@@ -17,11 +17,14 @@ public:
 	void SetName(const std::string& name);
 	void Reload(const PlayerData& data);
 
+	uint64_t GetUUID() const { return m_Uuid; }
+
 protected:
 	sf::RectangleShape m_Rect;
 	sf::Text m_Text;
 	std::string m_Name;
 	sf::Vector2f m_Velocity;
+	uint64_t m_Uuid{};
 
 	std::vector<Building*> m_Buildings;
 

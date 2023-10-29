@@ -7,7 +7,7 @@
 
 template<typename T>
 inline sf::Packet& operator<<(sf::Packet& packet, const std::vector<T>& vector) {
-	packet << static_cast<uint32_t>(vector.size());
+	packet << static_cast<int>(vector.size());
 	for (const T& t : vector)
 		packet << t;
 	return packet;
@@ -15,7 +15,7 @@ inline sf::Packet& operator<<(sf::Packet& packet, const std::vector<T>& vector) 
 
 template<typename T>
 inline sf::Packet& operator>>(sf::Packet& packet, std::vector<T>& vector) {
-	uint32_t size;
+	int size;
 	packet >> size;
 	vector.clear();
 	vector.reserve(size);

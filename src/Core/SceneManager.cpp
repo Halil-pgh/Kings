@@ -34,9 +34,6 @@ Scene* SceneManager::GetScene(const std::string& name) {
 		if (scene->GetName() == name)
 			return scene;
 	}
-
-	std::cout << "Failed to get scene!\n";
-	std::cout << "Could not found scene called '" << name << "'!\n";
 	return nullptr;
 }
 
@@ -51,8 +48,7 @@ void SceneManager::RemoveScene(const std::string& name) {
 		return;
 	}
 
-	delete* it;
-
+	delete *it;
 	m_Scenes.erase(it);
 }
 

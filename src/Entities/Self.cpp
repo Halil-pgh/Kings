@@ -67,6 +67,14 @@ void Self::OnDraw(sf::RenderWindow &window) {
 }
 
 bool Self::OnEvent(const sf::Event& event) {
+	if (auto client = dynamic_cast<Client*>(m_Networker); client != nullptr) {
+		if (!client->IsInGame()) {
+			SceneManager::SetActiveScene("Main");
+			Application::Get()->DestroyGameScene();
+			return true;
+		}
+	}
+
 	switch (event.type) {
 		case sf::Event::KeyPressed: {
 			sf::Vector2f mousePos = Application::GetMousePosition(SceneManager::GetActiveScene()->GetLayer("Game")->GetView());
@@ -94,11 +102,9 @@ bool Self::OnEvent(const sf::Event& event) {
 						options->OnDetach([&]() {
 							m_Mode = Mode::Walk;
 						});
-						options->OnCloseServer([&]() {
+						options->OnDisconnect([&]() {
 							SceneManager::SetActiveScene("Main");
-							m_Networker->ShoutDown();
-							delete m_Networker;
-							m_Networker = nullptr;
+							Application::Get()->DestroyGameScene();
 						});
 						SceneManager::GetActiveScene()->GetLayer("Menu")->AddEntity(options);
 					}
@@ -167,27 +173,13 @@ void Self::HandleConnection() {
 	});
 
 	for (const PlayerData& player : m_Networker->GetPlayers()) {
-		bool already = false;
 		for (int i = 0; i < m_JoinedUUIDs.size(); i++) {
 			if (m_JoinedUUIDs[i] == player.uuid) {
 				if (i > 0)
 					m_OtherPlayers[i - 1]->Reload(player);
-				already = true;
 				break;
 			}
 		}
-
-		if (already)
-			continue;
-
-		auto newPlayer = new Player();
-		newPlayer->Reload(player);
-		std::cout << "Someone new !\n";
-		std::cout << player.uuid << "\n";
-
-		SceneManager::GetActiveScene()->GetLayer("Game")->AddEntity(newPlayer);
-		m_JoinedUUIDs.push_back(player.uuid);
-		m_OtherPlayers.push_back(newPlayer);
 	}
 }
 
@@ -212,16 +204,7 @@ void Self::BecomeServer(const std::string& serverName) {
 	m_JoinedUUIDs.clear();
 
 	m_Networker = new Server(serverName);
-	m_Networker->SetPlayerData({
-	   m_Networker->GetUUID(),
-	   m_Name,
-	   m_Rect.getFillColor(),
-	   m_Rect.getPosition(),
-	   m_Rect.getRotation(),
-	   {}
-	});
-	m_JoinedUUIDs.push_back(m_Networker->GetUUID());
-	m_Networker->Run();
+	InitNetworker();
 }
 
 void Self::BecomeClient() {
@@ -230,24 +213,11 @@ void Self::BecomeClient() {
 	m_JoinedUUIDs.clear();
 
 	m_Networker = new Client();
-	m_Networker->SetPlayerData({
-	   m_Networker->GetUUID(),
-	   m_Name,
-	   m_Rect.getFillColor(),
-	   m_Rect.getPosition(),
-	   m_Rect.getRotation(),
-	   {}
-	});
-	m_JoinedUUIDs.push_back(m_Networker->GetUUID());
-	m_Networker->Run();
+	InitNetworker();
 }
 
-Client* Self::GetClient() {
-	auto client = dynamic_cast<Client*>(m_Networker);
-	if (client)
-		return client;
-	std::cout << "Client is null!\n";
-	return nullptr;
+Client** Self::GetClient() {
+	return reinterpret_cast<Client **>(&m_Networker);
 }
 
 Server* Self::GetServer() {
@@ -276,4 +246,40 @@ bool Self::CheckBuildingsForProduction() {
 	}
 
 	return result;
+}
+
+void Self::InitNetworker() {
+	m_Networker->SetPlayerData({
+		m_Networker->GetUUID(),
+		m_Name,
+		m_Rect.getFillColor(),
+		m_Rect.getPosition(),
+		m_Rect.getRotation(),
+		{}
+	});
+	m_Networker->OnConnect([&](const PlayerData& player) {
+		auto newPlayer = new Player();
+		newPlayer->Reload(player);
+		std::cout << "Someone new !\n";
+		std::cout << player.uuid << "\n";
+
+		SceneManager::GetActiveScene()->GetLayer("Game")->AddEntity(newPlayer);
+		m_JoinedUUIDs.push_back(player.uuid);
+		m_OtherPlayers.push_back(newPlayer);
+	});
+
+	m_Networker->OnDisconnect([&](uint64_t uuid) {
+		uint32_t i = 0;
+		for (auto player : m_OtherPlayers) {
+			if (player->GetUUID() == uuid) {
+				SceneManager::GetActiveScene()->GetLayer("Game")->RemoveEntity(player);
+				m_OtherPlayers.erase(m_OtherPlayers.begin() + i);
+				m_JoinedUUIDs.erase(m_JoinedUUIDs.begin() + i + 1);
+				break;
+			}
+			i++;
+		}
+	});
+	m_JoinedUUIDs.push_back(m_Networker->GetUUID());
+	m_Networker->Run();
 }

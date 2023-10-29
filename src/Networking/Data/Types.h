@@ -6,6 +6,8 @@ enum class DataTypes {
 	ConnectionRequest,
 	ConnectionAccept,
 	ConnectionReject,
+	DisconnectServer,
+	Disconnect,
 	PlayerData,
 	ServerData
 };

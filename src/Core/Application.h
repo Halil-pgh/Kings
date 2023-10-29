@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Scene.h"
+#include "Entities/Self.h"
 
 class Application {
 public:
@@ -13,6 +14,11 @@ public:
 	inline bool IsRunning() const { return m_Running; }
 	inline const sf::View& GetDefaultView() { return m_Window.getDefaultView(); }
 
+	void DestroyGameScene();
+	void CreateGameScene();
+	void DestroyServerList();
+	void CreateServerList();
+
 private:
 	Application();
 	~Application();
@@ -22,6 +28,8 @@ private:
 
 	sf::RenderWindow m_Window;
 	bool m_Running = true;
+	Self* m_Self;
+	ServerList* m_ServerList;
 
 	friend class Options;
 };

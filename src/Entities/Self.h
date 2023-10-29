@@ -25,12 +25,13 @@ public:
 	void BecomeServer(const std::string& serverName);
 	void BecomeClient();
 
-	Client* GetClient();
+	Client** GetClient();
 	Server* GetServer();
 
 private:
 	void FollowMouse();
 	void HandleConnection();
+	void InitNetworker();
 	bool CheckBuildingsForProduction();
 
 private:

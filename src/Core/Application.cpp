@@ -35,17 +35,22 @@ Application::~Application() {
 }
 
 void Application::Run() {
-	auto self = new Self();
+	m_Self = new Self();
+	m_ServerList = new ServerList();
 	auto textInput = new TextInput((float)GetWindowBase().getSize().x / 3, 3.0f * (float)GetWindowBase().getSize().y / 12, (float)GetWindowBase().getSize().x / 3, 50, "Enter your name");
-	auto serverList = new ServerList();
 
 	auto createButton = new Button(2.0f * (float)GetWindowBase().getSize().x / 12, 7.0f * (float)GetWindowBase().getSize().y / 12, 2.0f * (float)GetWindowBase().getSize().x / 12, 50, "Create Game");
 	createButton->SetOnClickCallback([&]() {
 		if (textInput->Get().empty())
 			return;
-		self->SetName(textInput->Get());
-		self->BecomeServer(textInput->Get());
 
+		if (SceneManager::GetScene("Game") == nullptr)
+			CreateGameScene();
+		m_Self->SetName(textInput->Get());
+		m_Self->BecomeServer(textInput->Get());
+
+		if (SceneManager::GetScene("Game") == nullptr)
+			CreateGameScene();
 		SceneManager::SetActiveScene("Game");
 	});
 
@@ -53,11 +58,16 @@ void Application::Run() {
 	joinButton->SetOnClickCallback([&]() {
 		if (textInput->Get().empty())
 			return;
-		self->SetName(textInput->Get());
-		self->BecomeClient();
-		serverList->SetClient(self->GetClient());
-		serverList->SetBackScene("Main");
 
+		if (SceneManager::GetScene("Game") == nullptr)
+			CreateGameScene();
+		m_Self->SetName(textInput->Get());
+		m_Self->BecomeClient();
+
+		if (SceneManager::GetScene("Server List") == nullptr)
+			CreateServerList();
+		m_ServerList->SetClient(m_Self->GetClient());
+		m_ServerList->SetBackScene("Main");
 		SceneManager::SetActiveScene("Server List");
 	});
 
@@ -65,7 +75,7 @@ void Application::Run() {
 	SceneManager::AddScene(gameScene);
 	gameScene->AddLayer("UI");
 	gameScene->AddLayer("Game");
-	gameScene->GetLayer("Game")->AddEntity(self);
+	gameScene->GetLayer("Game")->AddEntity(m_Self);
 
 	auto mainScene = new Scene("Main");
 	SceneManager::AddScene(mainScene);
@@ -77,7 +87,7 @@ void Application::Run() {
 	auto serverListScene = new Scene("Server List");
 	SceneManager::AddScene(serverListScene);
 	serverListScene->AddLayer("UI");
-	serverListScene->GetLayer("UI")->AddEntity(serverList);
+	serverListScene->GetLayer("UI")->AddEntity(m_ServerList);
 
 	sf::Event event{};
 	sf::Clock clock;
@@ -116,4 +126,29 @@ sf::Vector2f Application::GetMousePosition(const sf::View& base) {
 	mousePos.x += base.getCenter().x - base.getSize().x / 2;
 	mousePos.y += base.getCenter().y - base.getSize().y / 2;
 	return mousePos;
+}
+
+void Application::DestroyGameScene() {
+	SceneManager::RemoveScene("Game");
+}
+
+void Application::CreateGameScene() {
+	m_Self = new Self();
+	auto gameScene = new Scene("Game");
+	SceneManager::AddScene(gameScene);
+	gameScene->AddLayer("UI");
+	gameScene->AddLayer("Game");
+	gameScene->GetLayer("Game")->AddEntity(m_Self);
+}
+
+void Application::DestroyServerList() {
+	SceneManager::RemoveScene("Server List");
+}
+
+void Application::CreateServerList() {
+	m_ServerList = new ServerList();
+	auto serverListScene = new Scene("Server List");
+	SceneManager::AddScene(serverListScene);
+	serverListScene->AddLayer("UI");
+	serverListScene->GetLayer("UI")->AddEntity(m_ServerList);
 }

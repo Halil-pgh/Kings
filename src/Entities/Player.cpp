@@ -43,6 +43,7 @@ void Player::SetName(const std::string& name) {
 }
 
 void Player::Reload(const PlayerData& data) {
+	m_Uuid = data.uuid;
 	m_Rect.setFillColor(data.color);
 	m_Rect.setRotation(data.rotation);
 	m_Rect.setPosition(data.position);

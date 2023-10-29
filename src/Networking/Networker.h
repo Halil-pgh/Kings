@@ -15,6 +15,9 @@ public:
 	virtual void SetPlayerData(const PlayerData& data) = 0;
 	virtual uint64_t GetUUID() = 0;
 
+	virtual void OnDisconnect(std::function<void(uint64_t)>) = 0;
+	virtual void OnConnect(std::function<void(const PlayerData&)>) = 0;
+
 protected:
 	static uint64_t GenerateUUID() {
 		std::random_device rd;

@@ -9,7 +9,7 @@ public:
 	ServerList();
 
 	void SetBackScene(const std::string& name);
-	void SetClient(Client* client);
+	void SetClient(Client** client);
 
 	void OnAttach() override {}
 	void OnUpdate(float deltaTime) override;
@@ -24,5 +24,5 @@ private:
 	std::vector<ServerInfo> m_ServerInfos;
 	ServerInfo m_SelectedServerInfo;
 
-	Client* m_Client = nullptr;
+	Client** m_Client = nullptr;
 };

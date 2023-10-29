@@ -17,7 +17,7 @@ Options::Options() {
 	m_Text.setCharacterSize(24);
 	m_Text.setString("Esc to exit \n"
 					 "A to close the app \n"
-					 "S to close the server");
+					 "S to disconnect");
 	m_Text.setPosition(10, 100);
 	m_Text.setFillColor(sf::Color::Black);
 	m_Text.setStyle(sf::Text::Regular);
@@ -50,7 +50,7 @@ bool Options::OnEvent(const sf::Event &event) {
 					return true;
 				}
 				case sf::Keyboard::S: {
-					m_OnCloseServer();
+					m_OnDisconnect();
 					return true;
 				}
 				case sf::Keyboard::Escape: {

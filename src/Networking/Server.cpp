@@ -7,11 +7,6 @@
 #include "Data/Connections.h"
 #include "Data/ServerData.h"
 
-struct ClientData {
-	sf::IpAddress ip;
-	unsigned short port;
-};
-
 Server::Server(std::string name)
 	: m_Name(std::move(name)) {
 	m_Data.uuid = GenerateUUID();
@@ -27,54 +22,61 @@ Server::Server(std::string name)
 }
 
 Server::~Server() {
-	m_Socket.unbind();
-
-	m_Running = false;
-	if (m_Thread.joinable())
-		m_Thread.join();
+	ShoutDown();
 }
 
 void Server::Run() {
 	m_Running = true;
 	m_Thread = std::thread([&]() {
 
-		// Warning: clients and m_Players are needs to sync!
-		std::vector<ClientData> clients;
-		sf::IpAddress clientIp;
-		unsigned short clientPort;
-
+		// Warning: m_Clients and m_Players are needs to sync!
 		while (m_Running) {
+			sf::IpAddress clientIp;
+			unsigned short clientPort;
 			sf::Packet packet;
-			if (m_Socket.receive(packet, clientIp, clientPort) != sf::Socket::NotReady) {
+			if ((m_Socket.receive(packet, clientIp, clientPort) != sf::Socket::NotReady) && packet) {
 				unsigned int typeInt;
 				packet >> typeInt;
 				auto type = (DataTypes)typeInt;
-
 				if (type == DataTypes::ConnectionRequest) {
 					PlayerData data;
 					packet >> data;
 
-					clients.push_back({
+					// send connection request for other m_Clients
+					packet.clear();
+					packet << (unsigned int)DataTypes::ConnectionRequest;
+					packet << data;
+					for (const auto& client : m_Clients) {
+						if (m_Socket.send(packet, client.ip, client.port) != sf::Socket::Done) {
+							std::cout << "Failed to send client " << client.ip << ":" << client.port << " request!\n";
+							assert(false);
+						}
+					}
+
+					// Connection accept filled before this client added!
+					ConnectionAccept accept;
+					accept.players = m_Players;
+
+					m_Clients.push_back({
 						clientIp,
 						clientPort
 					});
 					m_Players.push_back(data);
+					m_OnConnect(data);
 
+					// send connection accept to the client
 					packet.clear();
-
 					packet << (unsigned int)DataTypes::ConnectionAccept;
-					ConnectionAccept accept = {
-						m_Name,
-						(unsigned int)m_Players.size()
-					};
 					packet << accept;
-
 					if (m_Socket.send(packet, clientIp, clientPort) != sf::Socket::Done) {
 						std::cout << "Failed to send client " << clientIp << ":" << clientPort << " accepted!\n";
 						assert(false);
 					}
 				}
 				else if (type == DataTypes::PlayerData) {
+					if (!packet)
+						break;
+
 					PlayerData data;
 					packet >> data;
 
@@ -89,13 +91,37 @@ void Server::Run() {
 					};
 
 					packet.clear();
-
 					packet << (unsigned int)DataTypes::ConnectionAvailable;
 					packet << conn;
 
 					if (m_Socket.send(packet, clientIp, clientPort) != sf::Socket::Done) {
 						std::cout << "Failed to send client " << clientIp << ":" << clientPort << " available!\n";
 						assert(false);
+					}
+				}
+				else if (type == DataTypes::Disconnect) {
+					Disconnect data;
+					packet >> data;
+					m_OnDisconnect(data.uuid);
+
+					std::cout << "Received disconnecting message!\n";
+
+					for (uint32_t i = 0; i < m_Players.size(); i++) {
+						if (m_Players[i].uuid == data.uuid) {
+							m_Clients.erase(m_Clients.begin() + i - 1);
+							m_Players.erase(m_Players.begin() + i);
+							break;
+						}
+					}
+
+					packet.clear();
+					packet << (unsigned int)DataTypes::Disconnect;
+					packet << data;
+					for (ClientData& client : m_Clients) {
+						if (m_Socket.send(packet, client.ip, client.port) != sf::Socket::Done) {
+							std::cout << "Failed to send disconnect data to " << client.ip << ":" << client.port << "\n";
+							assert(false);
+						}
 					}
 				}
 			}
@@ -109,7 +135,7 @@ void Server::Run() {
 
 			packet << serverData;
 
-			for (ClientData& client : clients) {
+			for (ClientData& client : m_Clients) {
 				if (m_Socket.send(packet, client.ip, client.port) != sf::Socket::Done) {
 					std::cout << "Failed to send players data to " << client.ip << ":" << client.port << "\n";
 					assert(false);
@@ -126,7 +152,20 @@ void Server::SetPlayerData(const PlayerData &data) {
 }
 
 void Server::ShoutDown() {
+	sf::Packet packet;
+	Disconnect data { GetUUID() };
+	// Server disconnect has to be something else
+	packet << (unsigned int)DataTypes::DisconnectServer;
+	packet << data;
+	for (const auto& client : m_Clients) {
+		if (m_Socket.send(packet, client.ip, client.port) != sf::Socket::Done) {
+			std::cout << "Failed to send disconnect data to client " << client.ip << ":" << client.port << "\n";
+			assert(false);
+		}
+	}
+
 	m_Running = false;
 	if (m_Thread.joinable())
 		m_Thread.join();
+	m_Socket.unbind();
 }
