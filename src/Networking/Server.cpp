@@ -55,13 +55,19 @@ void Server::Run() {
 
 					// Connection accept filled before this client added!
 					ConnectionAccept accept;
-					accept.players = m_Players;
+					{
+						std::lock_guard<std::mutex> lock(m_PlayersMutex);
+						accept.players = m_Players;
+					}
 
 					m_Clients.push_back({
 						clientIp,
 						clientPort
 					});
-					m_Players.push_back(data);
+					{
+						std::lock_guard<std::mutex> lock(m_PlayersMutex);
+						m_Players.push_back(data);
+					}
 					m_OnConnect(data);
 
 					// send connection accept to the client
@@ -80,9 +86,12 @@ void Server::Run() {
 					PlayerData data;
 					packet >> data;
 
-					for (PlayerData& player : m_Players)
-						if (player.uuid == data.uuid)
-							player = data;
+					{
+						std::lock_guard<std::mutex> lock(m_PlayersMutex);
+						for (PlayerData& player : m_Players)
+							if (player.uuid == data.uuid)
+								player = data;
+					}
 				}
 				else if (type == DataTypes::ConnectionAvailableRequest) {
 					ConnectionAvailable conn = {
@@ -106,11 +115,14 @@ void Server::Run() {
 
 					std::cout << "Received disconnecting message!\n";
 
-					for (uint32_t i = 0; i < m_Players.size(); i++) {
-						if (m_Players[i].uuid == data.uuid) {
-							m_Clients.erase(m_Clients.begin() + i - 1);
-							m_Players.erase(m_Players.begin() + i);
-							break;
+					{
+						std::lock_guard<std::mutex> lock(m_PlayersMutex);
+						for (uint32_t i = 0; i < m_Players.size(); i++) {
+							if (m_Players[i].uuid == data.uuid) {
+								m_Clients.erase(m_Clients.begin() + i - 1);
+								m_Players.erase(m_Players.begin() + i);
+								break;
+							}
 						}
 					}
 
@@ -130,8 +142,10 @@ void Server::Run() {
 			packet << (unsigned int)DataTypes::ServerData;
 
 			ServerData serverData;
-			std::lock_guard<std::mutex> lock(m_PlayersMutex);
-			serverData.players = m_Players;
+			{
+				std::lock_guard<std::mutex> lock(m_PlayersMutex);
+				serverData.players = m_Players;
+			}
 
 			packet << serverData;
 
@@ -146,21 +160,25 @@ void Server::Run() {
 }
 
 void Server::SetPlayerData(const PlayerData &data) {
-	std::lock_guard<std::mutex> lock(m_PlayersMutex);
+	{
+		std::lock_guard<std::mutex> lock(m_PlayersMutex);
+		m_Players[0] = data;
+	}
 	m_Data = data;
-	m_Players[0] = data;
 }
 
 void Server::ShoutDown() {
 	sf::Packet packet;
 	Disconnect data { GetUUID() };
 	// Server disconnect has to be something else
-	packet << (unsigned int)DataTypes::DisconnectServer;
-	packet << data;
-	for (const auto& client : m_Clients) {
-		if (m_Socket.send(packet, client.ip, client.port) != sf::Socket::Done) {
-			std::cout << "Failed to send disconnect data to client " << client.ip << ":" << client.port << "\n";
-			assert(false);
+	for (int i = 0; i < 10; i++) {
+		packet << (unsigned int)DataTypes::DisconnectServer;
+		packet << data;
+		for (const auto& client : m_Clients) {
+			if (m_Socket.send(packet, client.ip, client.port) != sf::Socket::Done) {
+				std::cout << "Failed to send disconnect data to client " << client.ip << ":" << client.port << "\n";
+				assert(false);
+			}
 		}
 	}
 
