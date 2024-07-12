@@ -42,7 +42,7 @@ private:
 	std::vector<PlayerData> m_Players;
 	sf::IpAddress m_ServerIp;
 
-	unsigned short m_ServerPort;
+	unsigned short m_ServerPort{};
 	sf::UdpSocket m_Socket;
 
 	std::thread m_Thread;

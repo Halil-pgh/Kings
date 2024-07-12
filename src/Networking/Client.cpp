@@ -130,11 +130,9 @@ void Client::ShoutDown() {
 		Disconnect data { GetUUID() };
 		packet << (unsigned int)DataTypes::Disconnect;
 		packet << data;
-		for (int i = 0; i < 100; i++) {
-			if (m_Socket.send(packet, m_ServerIp, Server::PORT) != sf::Socket::Done) {
-				std::cout << "Failed to send disconnect data to server " << m_ServerIp << ":" << Server::PORT << "\n";
-				assert(false);
-			}
+		if (m_Socket.send(packet, m_ServerIp, Server::PORT) != sf::Socket::Done) {
+			std::cout << "Failed to send disconnect data to server " << m_ServerIp << ":" << Server::PORT << "\n";
+			assert(false);
 		}
 		std::cout << "Disconnect message send!\n";
 	}

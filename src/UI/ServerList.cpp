@@ -10,26 +10,30 @@
 #define LIST_PADDING 20
 #define SERVER_CART_HEIGHT 100
 
-ServerList::ServerList()
-	: m_BackButton(WINDOW_SIZE.x / (COLUMNS * 4), WINDOW_SIZE.y - 3 * (WINDOW_SIZE.y / (ROWS * 4)),
-		WINDOW_SIZE.x / (COLUMNS * 2), WINDOW_SIZE.y / (ROWS * 2), "Back"),
-	m_RefreshButton(5 * WINDOW_SIZE.x / (COLUMNS * 4), WINDOW_SIZE.y - 3 * (WINDOW_SIZE.y / (ROWS * 4)),
-		WINDOW_SIZE.x / (COLUMNS * 2), WINDOW_SIZE.y / (ROWS * 2), "Refresh"),
-	m_JoinButton(9 * WINDOW_SIZE.x / (COLUMNS * 4), WINDOW_SIZE.y - 3 * (WINDOW_SIZE.y / (ROWS * 4)),
-		WINDOW_SIZE.x / (COLUMNS * 2), WINDOW_SIZE.y / (ROWS * 2), "Join") {
-	m_JoinButton.SetActive(false);
-	m_JoinButton.SetOnClickCallback([&]() {
+ServerList::ServerList() {
+	m_BackButton = std::make_shared<Button>(WINDOW_SIZE.x / (COLUMNS * 4), WINDOW_SIZE.y - 3 * (WINDOW_SIZE.y / (ROWS * 4)),
+											WINDOW_SIZE.x / (COLUMNS * 2), WINDOW_SIZE.y / (ROWS * 2), "Back");
+	m_RefreshButton = std::make_shared<Button>(5 * WINDOW_SIZE.x / (COLUMNS * 4), WINDOW_SIZE.y - 3 * (WINDOW_SIZE.y / (ROWS * 4)),
+											   WINDOW_SIZE.x / (COLUMNS * 2), WINDOW_SIZE.y / (ROWS * 2), "Refresh");
+	m_JoinButton = std::make_shared<Button>(9 * WINDOW_SIZE.x / (COLUMNS * 4), WINDOW_SIZE.y - 3 * (WINDOW_SIZE.y / (ROWS * 4)),
+											WINDOW_SIZE.x / (COLUMNS * 2), WINDOW_SIZE.y / (ROWS * 2), "Join");
+	m_JoinButton->SetActive(false);
+	m_JoinButton->SetOnClickCallback([&]() {
 		(*m_Client)->JoinServer(m_SelectedServerInfo);
 		if (SceneManager::GetScene("Game") == nullptr)
 			Application::Get()->CreateGameScene();
 		SceneManager::SetActiveScene("Game");
 		Application::Get()->DestroyServerList();
 	});
+
+	Application::Get()->SetButtonTheme(m_BackButton);
+	Application::Get()->SetButtonTheme(m_RefreshButton);
+	Application::Get()->SetButtonTheme(m_JoinButton);
 }
 
 void ServerList::SetBackScene(const std::string& name) {
-	m_BackButton.SetOnClickCallback([&, name]() {
-		m_JoinButton.SetActive(false);
+	m_BackButton->SetOnClickCallback([&, name]() {
+		m_JoinButton->SetActive(false);
 		m_SelectedServerInfo = {};
 
 		SceneManager::SetActiveScene(name);
@@ -42,7 +46,7 @@ void ServerList::SetBackScene(const std::string& name) {
 void ServerList::SetClient(Client** client) {
 	m_Client = client;
 	(*m_Client)->RefreshServers();
-	m_RefreshButton.SetOnClickCallback([&]() {
+	m_RefreshButton->SetOnClickCallback([&]() {
 		(*m_Client)->RefreshServers();
 	});
 }
@@ -65,34 +69,34 @@ void ServerList::OnUpdate(float deltaTime) {
 				(float)WINDOW_SIZE.x / 2, SERVER_CART_HEIGHT, "Name: " + (*m_Client)->m_ServerInfos[i].name + ", Player Count: " + std::to_string((*m_Client)->m_ServerInfos[i].playerCount)
 			};
 			button.SetOnClickCallback([&, i]() {
-				m_JoinButton.SetActive(true);
+				m_JoinButton->SetActive(true);
 				m_SelectedServerInfo = (*m_Client)->m_ServerInfos[i];
 			});
 			m_ServerButtons.push_back(button);
 		}
 	}
 
-	m_BackButton.OnUpdate(deltaTime);
-	m_RefreshButton.OnUpdate(deltaTime);
-	m_JoinButton.OnUpdate(deltaTime);
+	m_BackButton->OnUpdate(deltaTime);
+	m_RefreshButton->OnUpdate(deltaTime);
+	m_JoinButton->OnUpdate(deltaTime);
 
 	for (Button& button : m_ServerButtons)
 		button.OnUpdate(deltaTime);
 }
 
 void ServerList::OnDraw(sf::RenderWindow& window) {
-	m_BackButton.OnDraw(window);
-	m_RefreshButton.OnDraw(window);
-	m_JoinButton.OnDraw(window);
+	m_BackButton->OnDraw(window);
+	m_RefreshButton->OnDraw(window);
+	m_JoinButton->OnDraw(window);
 
 	for (Button& button : m_ServerButtons)
 		button.OnDraw(window);
 }
 
 bool ServerList::OnEvent(const sf::Event& event) {
-	if (m_BackButton.OnEvent(event)) return true;
-	if (m_RefreshButton.OnEvent(event)) return true;
-	if (m_JoinButton.OnEvent(event)) return true;
+	if (m_BackButton->OnEvent(event)) return true;
+	if (m_RefreshButton->OnEvent(event)) return true;
+	if (m_JoinButton->OnEvent(event)) return true;
 
 	for (Button& button : m_ServerButtons) {
 		if (button.OnEvent(event)) {

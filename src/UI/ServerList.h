@@ -17,9 +17,9 @@ public:
 	bool OnEvent(const sf::Event& event) override;
 
 private:
-	Button m_BackButton;
-	Button m_RefreshButton;
-	Button m_JoinButton;
+	std::shared_ptr<Button> m_BackButton;
+	std::shared_ptr<Button> m_RefreshButton;
+	std::shared_ptr<Button> m_JoinButton;
 	std::vector<Button> m_ServerButtons;
 	std::vector<ServerInfo> m_ServerInfos;
 	ServerInfo m_SelectedServerInfo;

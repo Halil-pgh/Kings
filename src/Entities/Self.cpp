@@ -32,6 +32,7 @@ void Self::OnUpdate(float deltaTime) {
 	if (m_Mode == Mode::Walk) {
 		m_Text.move(m_Velocity * deltaTime);
 		m_Rect.move(m_Velocity * deltaTime);
+		// TODO: Send position to server
 	}
 	else if (m_Mode == Mode::Build) {
 		sf::Vector2f mousePos = Application::GetMousePosition(SceneManager::GetActiveScene()->GetLayer("Game")->GetView());
@@ -98,7 +99,7 @@ bool Self::OnEvent(const sf::Event& event) {
 					else {
 						m_Mode = Mode::Settings;
 						SceneManager::GetActiveScene()->AddLayer("Menu", 1);
-						auto options = new Options();
+						auto options = std::make_shared<Options>();
 						options->OnDetach([&]() {
 							m_Mode = Mode::Walk;
 						});
@@ -138,6 +139,7 @@ bool Self::OnEvent(const sf::Event& event) {
 						}
 						newBuilding->SetProduction(false);
 						m_Buildings.push_back(newBuilding);
+						// TODO: Send building to server
 						return true;
 					}
 					return false;
@@ -229,18 +231,23 @@ Server* Self::GetServer() {
 }
 
 bool Self::CheckBuildingsForProduction() {
-	bool result = std::ranges::all_of(m_Buildings, [&](auto building) {
-		return !m_ProductionBuilding->GetRectangle().intersects(building->GetRectangle());
-	});
+	static const int pudding = 30;
 
+	static const auto check_function = [&](auto building) {
+		sf::FloatRect biggerRect = building->GetRectangle();
+		biggerRect.width += pudding * 2;
+		biggerRect.height += pudding * 2;
+		biggerRect.left -= pudding;
+		biggerRect.top -= pudding;
+		return !m_ProductionBuilding->GetRectangle().intersects(biggerRect);
+	};
+
+	bool result = std::ranges::all_of(m_Buildings, check_function);
 	if (!result)
 		return result;
 
 	for (auto player : m_OtherPlayers) {
-		result = std::ranges::all_of(player->m_Buildings, [&](auto building) {
-			return !m_ProductionBuilding->GetRectangle().intersects(building->GetRectangle());
-		});
-
+		result = std::ranges::all_of(player->m_Buildings, check_function);
 		if (!result)
 			return result;
 	}
@@ -258,10 +265,11 @@ void Self::InitNetworker() {
 		{}
 	});
 	m_Networker->OnConnect([&](const PlayerData& player) {
-		auto newPlayer = new Player();
+		auto newPlayer = std::make_shared<Player>();
 		newPlayer->Reload(player);
 		std::cout << "Someone new !\n";
 		std::cout << player.uuid << "\n";
+		std::cout << player.buildings.size() << "\n";
 
 		SceneManager::GetActiveScene()->GetLayer("Game")->AddEntity(newPlayer);
 		m_JoinedUUIDs.push_back(player.uuid);

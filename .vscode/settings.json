@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "numbers": "cpp"
+    },
+    "cmake.buildDirectory": "${workspaceFolder}/build-cmake-debug",
+    "cmake.configureArgs": [
+        "-G Ninja",
+        "-DCMAKE_BUILD_TYPE=Debug",
+        "-DBUILD_SHARED_LIBS=OFF",
+        "-S ${workspaceFolder}"
+    ],
+}

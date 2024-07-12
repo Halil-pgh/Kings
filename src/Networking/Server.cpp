@@ -99,6 +99,8 @@ void Server::Run() {
 						(unsigned int)m_Players.size()
 					};
 
+					std::cout << "Connection available...\n";
+
 					packet.clear();
 					packet << (unsigned int)DataTypes::ConnectionAvailable;
 					packet << conn;
@@ -109,11 +111,9 @@ void Server::Run() {
 					}
 				}
 				else if (type == DataTypes::Disconnect) {
-					Disconnect data;
+					Disconnect data{};
 					packet >> data;
 					m_OnDisconnect(data.uuid);
-
-					std::cout << "Received disconnecting message!\n";
 
 					{
 						std::lock_guard<std::mutex> lock(m_PlayersMutex);
@@ -170,15 +170,14 @@ void Server::SetPlayerData(const PlayerData &data) {
 void Server::ShoutDown() {
 	sf::Packet packet;
 	Disconnect data { GetUUID() };
+
 	// Server disconnect has to be something else
-	for (int i = 0; i < 10; i++) {
-		packet << (unsigned int)DataTypes::DisconnectServer;
-		packet << data;
-		for (const auto& client : m_Clients) {
-			if (m_Socket.send(packet, client.ip, client.port) != sf::Socket::Done) {
-				std::cout << "Failed to send disconnect data to client " << client.ip << ":" << client.port << "\n";
-				assert(false);
-			}
+	packet << (unsigned int)DataTypes::DisconnectServer;
+	packet << data;
+	for (const auto& client : m_Clients) {
+		if (m_Socket.send(packet, client.ip, client.port) != sf::Socket::Done) {
+			std::cout << "Failed to send disconnect data to client " << client.ip << ":" << client.port << "\n";
+			assert(false);
 		}
 	}
 

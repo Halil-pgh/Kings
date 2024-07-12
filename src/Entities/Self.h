@@ -38,8 +38,8 @@ private:
 	Mode m_Mode = Mode::Walk;
 	std::unique_ptr<Building> m_ProductionBuilding;
 
-	ShopBar* m_ShopBar;
-	PlayerStats* m_PlayerStats;
+	std::shared_ptr<ShopBar> m_ShopBar;
+	std::shared_ptr<PlayerStats> m_PlayerStats;
 	unsigned int m_MaxSoldier = 0;
 	unsigned int m_MoneyPerSecond = 0;
 	unsigned int m_Money = 0;
@@ -49,6 +49,6 @@ private:
 	float m_Speed;
 	Networker* m_Networker;
 
-	std::vector<Player*> m_OtherPlayers;
+	std::vector<std::shared_ptr<Player>> m_OtherPlayers;
 	std::vector<uint64_t> m_JoinedUUIDs;
 };

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <UI/Button.h>
 #include "Scene.h"
 #include "Entities/Self.h"
 
@@ -19,6 +20,8 @@ public:
 	void DestroyServerList();
 	void CreateServerList();
 
+	void SetButtonTheme(const std::shared_ptr<Button>& button);
+
 private:
 	Application();
 	~Application();
@@ -28,8 +31,8 @@ private:
 
 	sf::RenderWindow m_Window;
 	bool m_Running = true;
-	Self* m_Self;
-	ServerList* m_ServerList;
+	std::shared_ptr<Self> m_Self;
+	std::shared_ptr<ServerList> m_ServerList;
 
 	friend class Options;
 };

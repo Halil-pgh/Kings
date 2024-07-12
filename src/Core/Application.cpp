@@ -35,11 +35,11 @@ Application::~Application() {
 }
 
 void Application::Run() {
-	m_Self = new Self();
-	m_ServerList = new ServerList();
-	auto textInput = new TextInput((float)GetWindowBase().getSize().x / 3, 3.0f * (float)GetWindowBase().getSize().y / 12, (float)GetWindowBase().getSize().x / 3, 50, "Enter your name");
+	m_ServerList = std::make_shared<ServerList>();
+	auto textInput = std::make_shared<TextInput>((float)GetWindowBase().getSize().x / 3, 3.0f * (float)GetWindowBase().getSize().y / 12, (float)GetWindowBase().getSize().x / 3, 50, "Enter your name");
 
-	auto createButton = new Button(2.0f * (float)GetWindowBase().getSize().x / 12, 7.0f * (float)GetWindowBase().getSize().y / 12, 2.0f * (float)GetWindowBase().getSize().x / 12, 50, "Create Game");
+	auto createButton = std::make_shared<Button>(2.0f * (float)GetWindowBase().getSize().x / 12, 7.0f * (float)GetWindowBase().getSize().y / 12, 2.0f * (float)GetWindowBase().getSize().x / 12, 50, "Create Game");
+	SetButtonTheme(createButton);
 	createButton->SetOnClickCallback([&]() {
 		if (textInput->Get().empty())
 			return;
@@ -49,12 +49,11 @@ void Application::Run() {
 		m_Self->SetName(textInput->Get());
 		m_Self->BecomeServer(textInput->Get());
 
-		if (SceneManager::GetScene("Game") == nullptr)
-			CreateGameScene();
 		SceneManager::SetActiveScene("Game");
 	});
 
-	auto joinButton = new Button(8.0f * (float)GetWindowBase().getSize().x / 12, 7.0f * (float)GetWindowBase().getSize().y / 12, 2.0f * (float)GetWindowBase().getSize().x / 12, 50, "Join Game");
+	auto joinButton = std::make_shared<Button>(8.0f * (float)GetWindowBase().getSize().x / 12, 7.0f * (float)GetWindowBase().getSize().y / 12, 2.0f * (float)GetWindowBase().getSize().x / 12, 50, "Join Game");
+	SetButtonTheme(joinButton);
 	joinButton->SetOnClickCallback([&]() {
 		if (textInput->Get().empty())
 			return;
@@ -71,11 +70,12 @@ void Application::Run() {
 		SceneManager::SetActiveScene("Server List");
 	});
 
-	auto gameScene = new Scene("Game");
-	SceneManager::AddScene(gameScene);
-	gameScene->AddLayer("UI");
-	gameScene->AddLayer("Game");
-	gameScene->GetLayer("Game")->AddEntity(m_Self);
+	auto exitButton = std::make_shared<Button>(5.0f * (float)GetWindowBase().getSize().x / 12, 8.0f * (float)GetWindowBase().getSize().y / 12, 2.0f * (float)GetWindowBase().getSize().x / 12, 50, "Exit");
+	SetButtonTheme(exitButton);
+	exitButton->SetOnClickCallback([&]() {
+		m_Window.close();
+		m_Running = false;
+	});
 
 	auto mainScene = new Scene("Main");
 	SceneManager::AddScene(mainScene);
@@ -83,11 +83,7 @@ void Application::Run() {
 	mainScene->GetLayer("UI")->AddEntity(textInput);
 	mainScene->GetLayer("UI")->AddEntity(createButton);
 	mainScene->GetLayer("UI")->AddEntity(joinButton);
-
-	auto serverListScene = new Scene("Server List");
-	SceneManager::AddScene(serverListScene);
-	serverListScene->AddLayer("UI");
-	serverListScene->GetLayer("UI")->AddEntity(m_ServerList);
+	mainScene->GetLayer("UI")->AddEntity(exitButton);
 
 	sf::Event event{};
 	sf::Clock clock;
@@ -95,7 +91,7 @@ void Application::Run() {
 	while (m_Running) {
 		SceneManager::GetActiveScene()->OnUpdate(clock.restart().asSeconds());
 
-		m_Window.clear();
+		m_Window.clear(sf::Color(231, 240, 220));
 		SceneManager::GetActiveScene()->OnDraw(m_Window);
 		m_Window.display();
 
@@ -133,7 +129,7 @@ void Application::DestroyGameScene() {
 }
 
 void Application::CreateGameScene() {
-	m_Self = new Self();
+	m_Self = std::make_shared<Self>();
 	auto gameScene = new Scene("Game");
 	SceneManager::AddScene(gameScene);
 	gameScene->AddLayer("UI");
@@ -146,9 +142,15 @@ void Application::DestroyServerList() {
 }
 
 void Application::CreateServerList() {
-	m_ServerList = new ServerList();
+	m_ServerList = std::make_shared<ServerList>();
 	auto serverListScene = new Scene("Server List");
 	SceneManager::AddScene(serverListScene);
 	serverListScene->AddLayer("UI");
 	serverListScene->GetLayer("UI")->AddEntity(m_ServerList);
+}
+
+void Application::SetButtonTheme(const std::shared_ptr<Button> &button) {
+	button->SetNormalColor(sf::Color(89, 116, 69));
+	button->SetHighlightedColor(sf::Color(101, 129, 71));
+	button->SetPressedColor(sf::Color(114, 151, 98));
 }
