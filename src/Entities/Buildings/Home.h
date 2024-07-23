@@ -5,11 +5,21 @@
 class Home : public Building {
 public:
 	Home(float x, float y);
+	Home();
 
 	void OnUpdate(float deltaTime) override;
 	bool OnEvent(const sf::Event &event) override;
 
 	std::string TextureName() final;
-
 	unsigned int GetMaxCount();
+
+	// Serialization
+	template<class Archive>
+	void serialize(Archive& archive) {
+		archive(cereal::base_class<Building>(this), m_Rect);
+	}
 };
+
+// Register the type and the polymorphic relation for serialization
+CEREAL_REGISTER_TYPE(Home)
+// CEREAL_REGISTER_POLYMORPHIC_RELATION(Building, Home)

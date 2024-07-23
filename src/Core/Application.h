@@ -3,6 +3,7 @@
 #include <UI/Button.h>
 #include "Scene.h"
 #include "Entities/Self.h"
+#include "UI/ServerList.h"
 
 class Application {
 public:

@@ -3,8 +3,8 @@
 #include "Player.h"
 #include "UI/PlayerStats.h"
 #include "UI/ShopBar.h"
-#include "Networking/Client.h"
-#include "Networking/Server.h"
+#include "Network/Client.h"
+#include "Network/Server.h"
 
 enum class Mode {
 	Walk,
@@ -24,14 +24,13 @@ public:
 
 	void BecomeServer(const std::string& serverName);
 	void BecomeClient();
+	void SetId(uint16_t id) { m_Id = id; }
 
-	Client** GetClient();
-	Server* GetServer();
+	std::shared_ptr<Client> GetClient();
+	std::shared_ptr<Server> GetServer();
 
 private:
 	void FollowMouse();
-	void HandleConnection();
-	void InitNetworker();
 	bool CheckBuildingsForProduction();
 
 private:
@@ -44,11 +43,15 @@ private:
 	unsigned int m_MoneyPerSecond = 0;
 	unsigned int m_Money = 0;
 	float m_MoneyTime = 0;
+	float m_Speed;
 
 private:
-	float m_Speed;
-	Networker* m_Networker;
+	uint16_t m_Id;
+	std::shared_ptr<Client> m_Client;
+	std::shared_ptr<Server> m_Server;
 
-	std::vector<std::shared_ptr<Player>> m_OtherPlayers;
-	std::vector<uint64_t> m_JoinedUUIDs;
+	std::thread m_ServerThread;
+	std::thread m_ClientThread;
+
+	std::unordered_map<uint16_t, std::shared_ptr<Player>> m_Players;
 };

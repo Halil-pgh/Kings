@@ -42,29 +42,7 @@ void Player::SetName(const std::string& name) {
 	m_Text.setPosition(TEXT_POS_X, TEXT_POS_Y);
 }
 
-void Player::Reload(const PlayerData& data) {
-	m_Uuid = data.uuid;
-	m_Rect.setFillColor(data.color);
-	m_Rect.setRotation(data.rotation);
-	m_Rect.setPosition(data.position);
-	SetName(data.name);
-
-	// TODO: pls find a better way around :/
-	for (auto building : m_Buildings) {
-		delete building;
-	}
-	m_Buildings.clear();
-	m_Buildings.reserve(data.buildings.size());
-	for (const auto& building : data.buildings) {
-		switch (building.type) {
-			case BuildingType::Home: {
-				m_Buildings.push_back(new Home(building.position.x, building.position.y));
-				break;
-			}
-			case BuildingType::Mine: {
-				m_Buildings.push_back(new Mine(building.position.x, building.position.y));
-				break;
-			}
-		}
-	}
+void Player::SetPosition(const sf::Vector2f &position) {
+	m_Rect.setPosition(position);
+	m_Text.setPosition(TEXT_POS_X, TEXT_POS_Y);
 }

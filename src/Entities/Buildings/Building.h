@@ -2,16 +2,20 @@
 
 #include "Entities/Entity.h"
 
-enum class BuildingType {
-	Home,
-	Mine,
+// For serialization
+#include <cereal/types/polymorphic.hpp>
 
-	Count // <- This is count, do not use that for BuildingType
+enum class BuildingType {
+	Home = 0,
+	Mine = 1,
+
+	Count = 2 // <- This is count, do not use that for BuildingType
 };
 
 class Building : public Entity {
 public:
 	Building(float x, float y, BuildingType type);
+	Building() = default;
 	~Building() override = default;
 
 	void OnAttach() override {}
@@ -28,6 +32,12 @@ public:
 
 	void SetProduction(bool production);
 	void SetProductable(bool productable);
+
+	// Serialization
+	template<class Archive>
+	void serialize(Archive& archive) {
+		archive(m_Rect, m_Type, m_IsProductable);
+	}
 
 protected:
 	BuildingType m_Type;

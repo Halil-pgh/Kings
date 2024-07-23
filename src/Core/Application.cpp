@@ -1,12 +1,12 @@
 #include "pch.h"
 #include "Application.h"
 
-#include "Entities/Player.h"
 #include "Entities/Self.h"
 #include "UI/FontManager.h"
 #include "UI/Button.h"
 #include "UI/ServerList.h"
 #include "UI/TextInput.h"
+#include "Network/Networker.h"
 #include "SceneManager.h"
 #include "TextureManager.h"
 #include "Random.h"
@@ -17,6 +17,7 @@ Application::Application() {
 	m_Window.create(sf::VideoMode(1024, 640), "Game");
 	Random::Init();
 	SceneManager::Init();
+	Networker::initialize();
 	FontManager::SetFont("normal", "assets/fonts/noto-sans/NotoSans-Regular.ttf");
 	FontManager::SetFont("emoji", "assets/fonts/noto-emoji/NotoColorEmoji-Regular.ttf");
 	TextureManager::AddTexture("home", "assets/images/home.png");
@@ -32,6 +33,7 @@ Application::~Application() {
 	SceneManager::Destroy();
 	FontManager::Destroy();
 	TextureManager::Destroy();
+	Networker::deinitialize();
 }
 
 void Application::Run() {
@@ -62,6 +64,7 @@ void Application::Run() {
 			CreateGameScene();
 		m_Self->SetName(textInput->Get());
 		m_Self->BecomeClient();
+		SceneManager::SetActiveScene("Game");
 
 		if (SceneManager::GetScene("Server List") == nullptr)
 			CreateServerList();

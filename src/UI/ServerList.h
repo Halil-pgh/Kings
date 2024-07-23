@@ -2,14 +2,19 @@
 
 #include "UI/Button.h"
 #include "Entities/Entity.h"
-#include "Networking/Client.h"
+#include "Network/Client.h"
+
+struct ServerInfo {
+	std::string name;
+	std::string ip;
+};
 
 class ServerList : public Entity {
 public:
 	ServerList();
 
 	void SetBackScene(const std::string& name);
-	void SetClient(Client** client);
+	void SetClient(const std::shared_ptr<Client>& client);
 
 	void OnAttach() override {}
 	void OnUpdate(float deltaTime) override;
@@ -20,9 +25,10 @@ private:
 	std::shared_ptr<Button> m_BackButton;
 	std::shared_ptr<Button> m_RefreshButton;
 	std::shared_ptr<Button> m_JoinButton;
-	std::vector<Button> m_ServerButtons;
+	std::shared_ptr<Button> m_AddServerButton;
+	std::vector<std::shared_ptr<Button>> m_ServerButtons;
 	std::vector<ServerInfo> m_ServerInfos;
 	ServerInfo m_SelectedServerInfo;
 
-	Client** m_Client = nullptr;
+	std::shared_ptr<Client> m_Client;
 };

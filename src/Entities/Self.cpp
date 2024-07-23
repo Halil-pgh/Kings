@@ -3,8 +3,9 @@
 
 #include "Entities/Buildings/Home.h"
 #include "Entities/Buildings/Mine.h"
-#include "Networking/Server.h"
-#include "Networking/Client.h"
+#include "Network/Networker.h"
+#include "Network/Packet.h"
+#include "Core/Serializator.h"
 #include "Core/SceneManager.h"
 #include "Core/Application.h"
 #include "UI/FontManager.h"
@@ -13,12 +14,10 @@
 #define WINDOW_SIZE (float)Application::Get()->GetWindowBase().getSize()
 
 Self::Self()
-	: m_Speed(100), m_Networker(nullptr), m_PlayerStats(new PlayerStats()), m_ShopBar(new ShopBar()) {
+	: m_Speed(100), m_PlayerStats(new PlayerStats()), m_ShopBar(new ShopBar()) {
 }
 
-Self::~Self() {
-	delete m_Networker;
-}
+Self::~Self() = default;
 
 void Self::OnAttach() {
 	SceneManager::GetScene("Game")->GetLayer("UI")->AddEntity(m_PlayerStats);
@@ -32,7 +31,13 @@ void Self::OnUpdate(float deltaTime) {
 	if (m_Mode == Mode::Walk) {
 		m_Text.move(m_Velocity * deltaTime);
 		m_Rect.move(m_Velocity * deltaTime);
-		// TODO: Send position to server
+
+		// Send position to server
+		Packet<sf::Vector2f> packet = {PacketType::Move, m_Id, m_Rect.getPosition()};
+		size_t size;
+		void* buffer = Serializator::serialize(packet, size);
+		m_Client->send(buffer, size);
+		free(buffer);
 	}
 	else if (m_Mode == Mode::Build) {
 		sf::Vector2f mousePos = Application::GetMousePosition(SceneManager::GetActiveScene()->GetLayer("Game")->GetView());
@@ -48,7 +53,15 @@ void Self::OnUpdate(float deltaTime) {
 	}
 
 	FollowMouse();
-	HandleConnection();
+
+	if (m_Client->isConnected()) {
+		m_Client->update();
+	}
+
+	// Update players
+	for (const auto& [_, player] : m_Players) {
+		player->OnUpdate(deltaTime);
+	}
 }
 
 void Self::OnDraw(sf::RenderWindow &window) {
@@ -56,6 +69,10 @@ void Self::OnDraw(sf::RenderWindow &window) {
 
 	window.draw(m_Rect);
 	window.draw(m_Text);
+
+	for (const auto& [_, player] : m_Players) {
+		player->OnDraw(window);
+	}
 
 	for (auto building : m_Buildings) {
 		building->OnDraw(window);
@@ -68,12 +85,10 @@ void Self::OnDraw(sf::RenderWindow &window) {
 }
 
 bool Self::OnEvent(const sf::Event& event) {
-	if (auto client = dynamic_cast<Client*>(m_Networker); client != nullptr) {
-		if (!client->IsInGame()) {
-			SceneManager::SetActiveScene("Main");
-			Application::Get()->DestroyGameScene();
-			return true;
-		}
+	if (!m_Client->isConnected()) {
+		SceneManager::SetActiveScene("Main");
+		Application::Get()->DestroyGameScene();
+		return true;
 	}
 
 	switch (event.type) {
@@ -125,21 +140,35 @@ bool Self::OnEvent(const sf::Event& event) {
 							break;
 						}
 
-						Building* newBuilding;
+						std::shared_ptr<Building> newBuilding;
 						if (m_ProductionBuilding->GetType() == BuildingType::Home) {
-							auto newHome = new Home(*(Home*)m_ProductionBuilding.get());
+							auto newHome = std::make_shared<Home>(*(Home*)m_ProductionBuilding.get());
 							m_MaxSoldier += newHome->GetMaxCount();
 							m_PlayerStats->SetMaxSoldierCount(m_MaxSoldier);
 							newBuilding = newHome;
+							newBuilding->SetProduction(false);
+
+							// Send building to server
+							Packet<Home> packet = {PacketType::CreateHome, m_Id, *newHome};
+							size_t size;
+							void* buffer = Serializator::serialize(packet, size);
+							m_Client->send(buffer, size);
+							free(buffer);
 						}
 						else if (m_ProductionBuilding->GetType() == BuildingType::Mine) {
-							auto newMine = new Mine(*(Mine*)m_ProductionBuilding.get());
+							auto newMine = std::make_shared<Mine>(*(Mine*)m_ProductionBuilding.get());
 							m_MoneyPerSecond += newMine->MoneyPerSecond();
 							newBuilding = newMine;
+							newBuilding->SetProduction(false);
+
+							// Send building to server
+							Packet<Mine> packet = {PacketType::CreateMine, m_Id, *newMine};
+							size_t size;
+							void* buffer = Serializator::serialize(packet, size);
+							m_Client->send(buffer, size);
+							free(buffer);
 						}
-						newBuilding->SetProduction(false);
 						m_Buildings.push_back(newBuilding);
-						// TODO: Send building to server
 						return true;
 					}
 					return false;
@@ -151,36 +180,6 @@ bool Self::OnEvent(const sf::Event& event) {
 		}
 		default: {
 			return false;
-		}
-	}
-}
-
-void Self::HandleConnection() {
-	// TODO: I have to do that better way :/
-	std::vector<BuildingData> buildingData(m_Buildings.size());
-	for (auto building : m_Buildings) {
-		buildingData.push_back({
-			building->GetType(),
-			building->GetPosition()
-		});
-	}
-
-	m_Networker->SetPlayerData({
-		m_Networker->GetUUID(),
-		m_Name,
-		m_Rect.getFillColor(),
-		m_Rect.getPosition(),
-		m_Rect.getRotation(),
-		buildingData
-	});
-
-	for (const PlayerData& player : m_Networker->GetPlayers()) {
-		for (int i = 0; i < m_JoinedUUIDs.size(); i++) {
-			if (m_JoinedUUIDs[i] == player.uuid) {
-				if (i > 0)
-					m_OtherPlayers[i - 1]->Reload(player);
-				break;
-			}
 		}
 	}
 }
@@ -201,33 +200,58 @@ void Self::FollowMouse() {
 }
 
 void Self::BecomeServer(const std::string& serverName) {
-	// Delete/clear everything before becoming server!
-	delete m_Networker;
-	m_JoinedUUIDs.clear();
-
-	m_Networker = new Server(serverName);
-	InitNetworker();
+	m_Server = std::make_shared<Server>(Server::PORT);
+	m_ServerThread = std::thread([&]() {
+		while (true) {
+			m_Server->update();
+		}
+	});
+	BecomeClient();
+	m_Client->connect("localhost", Server::PORT); // Make sure to call this function after setting the on connect callback.
 }
 
 void Self::BecomeClient() {
-	// Delete/clear everything before becoming client!
-	delete m_Networker;
-	m_JoinedUUIDs.clear();
-
-	m_Networker = new Client();
-	InitNetworker();
-}
-
-Client** Self::GetClient() {
-	return reinterpret_cast<Client **>(&m_Networker);
-}
-
-Server* Self::GetServer() {
-	auto server = dynamic_cast<Server*>(m_Networker);
-	if (server)
-		return server;
-	std::cout << "Server is null!\n";
-	return nullptr;
+	m_Client = std::make_shared<Client>();
+	m_Client->onConnect([&](uint16_t id) {
+		std::cout << "[CLIENT]: Connected to the server." << "\n";
+		m_Id = id;
+		Packet<Player> packet = {PacketType::Join, id, *this};
+		size_t size;
+		void* buffer = Serializator::serialize(packet, size);
+		m_Client->send(buffer, size);
+		free(buffer);
+	});
+	m_Client->onDisconnect([]() {
+		std::cout << "[CLIENT]: Disconnected from the server." << "\n";
+	});
+	m_Client->onReceive([&](void* data, size_t size) {
+		PacketType type = Serializator::desiriealizePacketType(data, size);
+		if (type == PacketType::Join) {
+			Packet<Player> packet = Serializator::deserialize<Player>(data, size);
+			std::cout << "[CLIENT]: " + packet.data.GetName() + " joined the server." << "\n";
+			m_Players[packet.id] = std::make_shared<Player>(packet.data);
+		} else if (type == PacketType::Leave) {
+			Packet<uint16_t> id = Serializator::deserialize<uint16_t>(data, size);
+			std::cout << "[CLIENT]: " + m_Players[id.data]->GetName() + " left the server." << "\n";
+			m_Players.erase(id.data);
+		} else if (type == PacketType::Chat) {
+			Packet<std::string> packet = Serializator::deserialize<std::string>(data, size);
+			if (packet.id == SERVER_ID) {
+				std::cout << packet.data << "\n";
+			} else {
+				std::cout << m_Players[packet.id]->GetName() + ": " + packet.data << "\n";
+			}
+		} else if (type == PacketType::Move) {
+			Packet<sf::Vector2f> packet = Serializator::deserialize<sf::Vector2f>(data, size);
+			m_Players[packet.id]->SetPosition(packet.data);
+		} else if (type == PacketType::CreateHome) {
+			Packet<Home> packet = Serializator::deserialize<Home>(data, size);
+			m_Players[packet.id]->AddBuilding(std::make_shared<Home>(packet.data));
+		} else if (type == PacketType::CreateMine) {
+			Packet<Mine> packet = Serializator::deserialize<Mine>(data, size);
+			m_Players[packet.id]->AddBuilding(std::make_shared<Mine>(packet.data));
+		}
+	});
 }
 
 bool Self::CheckBuildingsForProduction() {
@@ -246,7 +270,7 @@ bool Self::CheckBuildingsForProduction() {
 	if (!result)
 		return result;
 
-	for (auto player : m_OtherPlayers) {
+	for (const auto& [_, player] : m_Players) {
 		result = std::ranges::all_of(player->m_Buildings, check_function);
 		if (!result)
 			return result;
@@ -255,39 +279,10 @@ bool Self::CheckBuildingsForProduction() {
 	return result;
 }
 
-void Self::InitNetworker() {
-	m_Networker->SetPlayerData({
-		m_Networker->GetUUID(),
-		m_Name,
-		m_Rect.getFillColor(),
-		m_Rect.getPosition(),
-		m_Rect.getRotation(),
-		{}
-	});
-	m_Networker->OnConnect([&](const PlayerData& player) {
-		auto newPlayer = std::make_shared<Player>();
-		newPlayer->Reload(player);
-		std::cout << "Someone new !\n";
-		std::cout << player.uuid << "\n";
-		std::cout << player.buildings.size() << "\n";
+std::shared_ptr<Client> Self::GetClient() {
+	return m_Client;
+}
 
-		SceneManager::GetActiveScene()->GetLayer("Game")->AddEntity(newPlayer);
-		m_JoinedUUIDs.push_back(player.uuid);
-		m_OtherPlayers.push_back(newPlayer);
-	});
-
-	m_Networker->OnDisconnect([&](uint64_t uuid) {
-		uint32_t i = 0;
-		for (auto player : m_OtherPlayers) {
-			if (player->GetUUID() == uuid) {
-				SceneManager::GetActiveScene()->GetLayer("Game")->RemoveEntity(player);
-				m_OtherPlayers.erase(m_OtherPlayers.begin() + i);
-				m_JoinedUUIDs.erase(m_JoinedUUIDs.begin() + i + 1);
-				break;
-			}
-			i++;
-		}
-	});
-	m_JoinedUUIDs.push_back(m_Networker->GetUUID());
-	m_Networker->Run();
+std::shared_ptr<Server> Self::GetServer() {
+	return m_Server;
 }

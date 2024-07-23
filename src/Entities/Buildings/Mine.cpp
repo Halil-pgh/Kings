@@ -7,6 +7,10 @@ Mine::Mine(float x, float y)
 	m_Rect.setTexture(TextureManager::GetTexture(TextureName()));
 }
 
+Mine::Mine() {
+	m_Rect.setTexture(TextureManager::GetTexture(TextureName()));
+}
+
 void Mine::OnUpdate(float deltaTime) {
 
 }

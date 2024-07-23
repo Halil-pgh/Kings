@@ -19,6 +19,8 @@ file(GLOB_RECURSE SRC_FILES
 
 add_executable(Kings ${SRC_FILES})
 target_include_directories(Kings PRIVATE src)
+target_include_directories(Kings PRIVATE lib/cereal/include)
+target_include_directories(Kings PRIVATE lib)
 
 target_compile_definitions(Kings PUBLIC SFML_STATIC)
 target_link_libraries(Kings PRIVATE
@@ -30,3 +32,7 @@ target_link_libraries(Kings PRIVATE
 )
 
 target_precompile_headers(Kings PRIVATE src/pch.h)
+
+if(WIN32)
+    set_target_properties(Kings PROPERTIES WIN32_EXECUTABLE TRUE)
+endif()

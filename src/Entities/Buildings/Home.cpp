@@ -8,6 +8,10 @@ Home::Home(float x, float y)
 	m_Rect.setTexture(TextureManager::GetTexture(TextureName()));
 }
 
+Home::Home() {
+	m_Rect.setTexture(TextureManager::GetTexture(TextureName()));
+}
+
 void Home::OnUpdate(float deltaTime) {
 
 }
