@@ -4,7 +4,7 @@
 
 class Layer {
 public:
-	Layer(std::string name);
+	explicit Layer(std::string name);
 	~Layer();
 
 	inline const std::string& GetName() const { return m_Name; }

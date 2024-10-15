@@ -7,6 +7,7 @@ public:
 	TextInput(float x, float y, float width, float height, const std::string& defaultText = "");
 
 	void OnAttach() override {}
+	void OnDetach() override {}
 	void OnUpdate(float deltaTime) override;
 	void OnDraw(sf::RenderWindow& window) override;
 	bool OnEvent(const sf::Event& event) override;

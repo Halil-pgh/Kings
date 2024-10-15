@@ -8,7 +8,12 @@ Layer::Layer(std::string name)
 	m_View = Application::Get()->GetDefaultView();
 }
 
-Layer::~Layer() = default;
+Layer::~Layer() {
+	for (uint32_t i = 0; i < m_Entities.size(); i++) {
+		m_Entities[i]->OnDetach();
+	}
+	m_Entities.clear();
+}
 
 void Layer::AddEntity(const std::shared_ptr<Entity>& entity) {
 	m_Entities.push_back(entity);
@@ -21,6 +26,7 @@ void Layer::RemoveEntity(const std::shared_ptr<Entity>& entity) {
 		std::cout << "Entity couldn't found: " << entity << "\n";
 		return;
 	}
+	(*it)->OnDetach();
 	m_Entities.erase(it);
 }
 

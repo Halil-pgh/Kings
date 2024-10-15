@@ -10,36 +10,8 @@ Client::Client() {
 }
 
 Client::~Client() {
-	ENetEvent event;
-	enet_peer_disconnect(server, 0);
-	while (enet_host_service(client, &event, 3000) > 0) {
-		switch (event.type) {
-			case ENET_EVENT_TYPE_RECEIVE:
-				printf("A packet of length %lu containing %s was received from %s on channel %u.\n",
-					   event.packet->dataLength,
-					   event.packet->data,
-					   event.peer->data,
-					   event.channelID);
-				/* Clean up the packet now that we're done using it. */
-				enet_packet_destroy(event.packet);
-				break;
-
-			case ENET_EVENT_TYPE_DISCONNECT:
-				printf("Disconnection succeeded.\n");
-				connected = false;
-				break;
-
-			case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:
-				printf("Disconnection failed.\n");
-				break;
-
-			case ENET_EVENT_TYPE_NONE:
-				break;
-		}
-	}
-	if (!connected) {
-		enet_peer_reset(server);
-	}
+	if (server != nullptr)
+		disconnect();
 	enet_host_destroy(client);
 }
 
@@ -106,6 +78,33 @@ void Client::connect(const char* host, uint16_t port) {
 		connectCallback(event.peer->outgoingPeerID);
 	} else {
 		std::cout << "Connection to the server failed.\n";
+		enet_peer_reset(server);
+	}
+}
+
+void Client::disconnect() {
+	ENetEvent event;
+	enet_peer_disconnect(server, 0);
+	while (enet_host_service(client, &event, 100) > 0) {
+		switch (event.type) {
+			case ENET_EVENT_TYPE_RECEIVE:
+				enet_packet_destroy(event.packet);
+				break;
+
+			case ENET_EVENT_TYPE_DISCONNECT:
+				printf("Disconnection succeeded.\n");
+				connected = false;
+				break;
+
+			case ENET_EVENT_TYPE_DISCONNECT_TIMEOUT:
+				printf("Disconnection failed.\n");
+				break;
+
+			case ENET_EVENT_TYPE_NONE:
+				break;
+		}
+	}
+	if (!connected) {
 		enet_peer_reset(server);
 	}
 }

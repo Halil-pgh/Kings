@@ -9,6 +9,7 @@ public:
 	~Client();
 
 	void connect(const char* host, uint16_t port);
+	void disconnect();
 	void update();
 	bool isConnected() const { return connected; }
 public:

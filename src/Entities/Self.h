@@ -18,6 +18,7 @@ public:
 	~Self() override;
 
 	void OnAttach() override;
+	void OnDetach() override;
 	void OnUpdate(float deltaTime) override;
 	void OnDraw(sf::RenderWindow& window) override;
 	bool OnEvent(const sf::Event& event) override;
@@ -29,6 +30,7 @@ public:
 	std::shared_ptr<Client> GetClient();
 	std::shared_ptr<Server> GetServer();
 
+	void Reset();
 private:
 	void FollowMouse();
 	bool CheckBuildingsForProduction();
@@ -51,7 +53,5 @@ private:
 	std::shared_ptr<Server> m_Server;
 
 	std::thread m_ServerThread;
-	std::thread m_ClientThread;
-
 	std::unordered_map<uint16_t, std::shared_ptr<Player>> m_Players;
 };

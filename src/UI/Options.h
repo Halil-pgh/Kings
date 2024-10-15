@@ -10,6 +10,7 @@ public:
 	inline void OnDisconnect(const std::function<void()>& func) { m_OnDisconnect = func; }
 
 	void OnAttach() override;
+	void OnDetach() override {}
 	bool OnEvent(const sf::Event &event) override;
 	void OnDraw(sf::RenderWindow &window) override;
 	void OnUpdate(float deltaTime) override;

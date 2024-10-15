@@ -17,11 +17,18 @@ Self::Self()
 	: m_Speed(100), m_PlayerStats(new PlayerStats()), m_ShopBar(new ShopBar()) {
 }
 
-Self::~Self() = default;
+Self::~Self() {
+	std::cout << "Self destroyed\n";
+}
 
 void Self::OnAttach() {
 	SceneManager::GetScene("Game")->GetLayer("UI")->AddEntity(m_PlayerStats);
 	SceneManager::GetScene("Game")->GetLayer("UI")->AddEntity(m_ShopBar);
+}
+
+void Self::OnDetach() {
+	Reset();
+	std::cout << "OnDetach called\n";
 }
 
 void Self::OnUpdate(float deltaTime) {
@@ -202,7 +209,7 @@ void Self::FollowMouse() {
 void Self::BecomeServer(const std::string& serverName) {
 	m_Server = std::make_shared<Server>(Server::PORT);
 	m_ServerThread = std::thread([&]() {
-		while (true) {
+		while (m_Server && m_Server->isRunning()) {
 			m_Server->update();
 		}
 	});
@@ -263,6 +270,7 @@ bool Self::CheckBuildingsForProduction() {
 		biggerRect.height += pudding * 2;
 		biggerRect.left -= pudding;
 		biggerRect.top -= pudding;
+		std::cout << m_ProductionBuilding.get() << "\n";
 		return !m_ProductionBuilding->GetRectangle().intersects(biggerRect);
 	};
 
@@ -285,4 +293,20 @@ std::shared_ptr<Client> Self::GetClient() {
 
 std::shared_ptr<Server> Self::GetServer() {
 	return m_Server;
+}
+
+void Self::Reset() {
+	m_Buildings.clear();
+	m_Players.clear();
+	m_MaxSoldier = 0;
+	m_MoneyPerSecond = 0;
+	m_Money = 0;
+	m_MoneyTime = 0;
+	m_Speed = 100;
+	m_Client->disconnect();
+	m_Client.reset();
+	m_Server.reset();
+	if (m_ServerThread.joinable())
+		m_ServerThread.join();
+	m_Mode = Mode::Walk;
 }

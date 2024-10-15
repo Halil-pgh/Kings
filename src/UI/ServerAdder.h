@@ -11,6 +11,7 @@ public:
 	inline void OnServerAdd(const std::function<void(const std::string&, const std::string&)>& callback) { m_OnServerAdd = callback; }
 
 	void OnAttach() override;
+	void OnDetach() override {}
 	void OnUpdate(float deltaTime) override;
 	void OnDraw(sf::RenderWindow &window) override;
 	bool OnEvent(const sf::Event &event) override;

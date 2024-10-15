@@ -13,6 +13,7 @@ public:
 	inline void SetActive(bool active) { m_Active = active; }
 
 	void OnAttach() override {}
+	void OnDetach() override {}
 	void OnUpdate(float deltaTime) override;
 	void OnDraw(sf::RenderWindow& window) override;
 	bool OnEvent(const sf::Event& event) override;

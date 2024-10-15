@@ -17,6 +17,7 @@ public:
 	void SetClient(const std::shared_ptr<Client>& client);
 
 	void OnAttach() override {}
+	void OnDetach() override {}
 	void OnUpdate(float deltaTime) override;
 	void OnDraw(sf::RenderWindow& window) override;
 	bool OnEvent(const sf::Event& event) override;

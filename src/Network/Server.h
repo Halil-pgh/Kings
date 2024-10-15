@@ -13,6 +13,8 @@ public:
 
 	void update();
 	bool someClientConnected();
+	bool isRunning() const { return running; }
+	void stop() { running = false; }
 public:
 	void send(ENetPeer *peer, const void *data, size_t size);
 	void broadcast(const void *data, size_t size);
@@ -24,6 +26,7 @@ public:
 private:
 	ENetAddress address{};
 	ENetHost *host = nullptr;
+	bool running = true;
 
 	std::unordered_map<uint16_t, std::shared_ptr<Player>> players;
 };

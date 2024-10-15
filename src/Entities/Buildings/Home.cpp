@@ -12,9 +12,7 @@ Home::Home() {
 	m_Rect.setTexture(TextureManager::GetTexture(TextureName()));
 }
 
-void Home::OnUpdate(float deltaTime) {
-
-}
+void Home::OnUpdate(float deltaTime) {}
 
 bool Home::OnEvent(const sf::Event &event) {
 	return false;

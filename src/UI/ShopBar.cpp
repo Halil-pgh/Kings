@@ -51,9 +51,6 @@ ShopBar::ShopBar() {
 	}
 }
 
-void ShopBar::OnAttach() {
-}
-
 void ShopBar::OnUpdate(float deltaTime) {
 }
 
