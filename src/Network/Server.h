@@ -21,7 +21,7 @@ public:
 	void broadcastExcept(ENetPeer *peer, const void *data, size_t size);
 	void disconnect(ENetPeer *peer);
 
-	static const unsigned int PORT = 7777;
+	static const unsigned int PORT;
 
 private:
 	ENetAddress address{};

@@ -7,6 +7,8 @@
 #include "Entities/Buildings/Home.h"
 #include "Entities/Buildings/Mine.h"
 
+const unsigned int Server::PORT = 7777;
+
 Server::Server(uint16_t port) {
 	address.host = ENET_HOST_ANY;
 	address.port = port;
@@ -33,7 +35,7 @@ void Server::update() {
 			}
 
 			case ENET_EVENT_TYPE_RECEIVE: {
-				PacketType type = Serializator::desiriealizePacketType(event.packet->data, event.packet->dataLength);
+				PacketType type = Serializator::deserializePacketType(event.packet->data, event.packet->dataLength);
 				if (type == PacketType::Join) {
 					for (const auto& [id, entity] : players) {
 						Packet<Player> packet = {PacketType::Join, id, *(entity)};
@@ -149,6 +151,10 @@ void Server::broadcastExcept(ENetPeer *peer, const void *data, size_t size) {
 	}
 }
 
+bool Server::someClientConnected() {
+	return host->connectedPeers > 0;
+}
+
 void Server::disconnect(ENetPeer *peer) {
 	enet_peer_disconnect(peer, 0);
 	ENetEvent event;
@@ -159,8 +165,4 @@ void Server::disconnect(ENetPeer *peer) {
 	if (!disconnected) {
 		enet_peer_reset(peer);
 	}
-}
-
-bool Server::someClientConnected() {
-	return host->connectedPeers > 0;
 }

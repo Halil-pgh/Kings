@@ -14,21 +14,21 @@ ShopBar::ShopBar() {
 	// this needs to be synced with BuildingType
 	m_Keys = {'Q', 'W'};
 
-	m_Rects.reserve((int)BuildingType::Count);
-	m_KeysText.reserve((int)BuildingType::Count);
-	for (uint32_t i = 0; i < (int)BuildingType::Count; i++) {
+	m_Rects.reserve(static_cast<int>(BuildingType::Count));
+	m_KeysText.reserve(static_cast<int>(BuildingType::Count));
+	for (uint32_t i = 0; i < static_cast<int>(BuildingType::Count); i++) {
 		// Rectangles
 		sf::RectangleShape rect({CUBE_SIZE, CUBE_SIZE});
 		rect.setOutlineThickness(5.0f);
 		rect.setOutlineColor(sf::Color(211, 214, 208));
-		rect.setPosition(FIRST_X + (float)i * (CUBE_SIZE + rect.getOutlineThickness()), FIRST_Y);
+		rect.setPosition(FIRST_X + static_cast<float>(i) * (CUBE_SIZE + rect.getOutlineThickness()), FIRST_Y);
 		rect.setFillColor(sf::Color(255, 255, 255, 200));
 		switch (i) {
-			case (uint32_t)BuildingType::Home: {
+			case static_cast<uint32_t>(BuildingType::Home): {
 				rect.setTexture(TextureManager::GetTexture("home"));
 				break;
 			}
-			case (uint32_t)BuildingType::Mine: {
+			case static_cast<uint32_t>(BuildingType::Mine): {
 				rect.setTexture(TextureManager::GetTexture("mine"));
 				break;
 			}

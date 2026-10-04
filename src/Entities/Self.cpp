@@ -232,7 +232,7 @@ void Self::BecomeClient() {
 		std::cout << "[CLIENT]: Disconnected from the server." << "\n";
 	});
 	m_Client->onReceive([&](void* data, size_t size) {
-		PacketType type = Serializator::desiriealizePacketType(data, size);
+		PacketType type = Serializator::deserializePacketType(data, size);
 		if (type == PacketType::Join) {
 			Packet<Player> packet = Serializator::deserialize<Player>(data, size);
 			std::cout << "[CLIENT]: " + packet.data.GetName() + " joined the server." << "\n";

@@ -4,7 +4,6 @@
 #include "cereal/archives/binary.hpp"
 #include "cereal/types/string.hpp"
 #include "cereal/types/vector.hpp"
-#include "cereal/types/tuple.hpp"
 #include "cereal/types/memory.hpp"
 #include "SFML/Graphics/RectangleShape.hpp"
 #include "UI/FontManager.h"
@@ -137,7 +136,7 @@ public:
 		return obj;
 	}
 
-	static PacketType desiriealizePacketType(void* buffer, size_t size) {
+	static PacketType deserializePacketType(void* buffer, size_t size) {
 		std::string serializedData(static_cast<char*>(buffer), size);
 		std::istringstream iss(serializedData);
 		PacketType packetType;
