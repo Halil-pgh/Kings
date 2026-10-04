@@ -235,6 +235,12 @@ void Self::BecomeClient() {
 		std::cout << "[CLIENT]: Disconnected from the server." << "\n";
 	});
 	m_Client->onReceive([&](void* data, size_t size) {
+		// Packets can refer to players we don't know (e.g. a Leave for a peer that never joined).
+		auto findPlayer = [&](uint16_t id) -> Player* {
+			auto it = m_Players.find(id);
+			return it != m_Players.end() ? it->second.get() : nullptr;
+		};
+
 		PacketType type = Serializator::deserializePacketType(data, size);
 		if (type == PacketType::Join) {
 			Packet<Player> packet = Serializator::deserialize<Player>(data, size);
@@ -242,24 +248,29 @@ void Self::BecomeClient() {
 			m_Players[packet.id] = std::make_shared<Player>(packet.data);
 		} else if (type == PacketType::Leave) {
 			Packet<uint16_t> id = Serializator::deserialize<uint16_t>(data, size);
-			std::cout << "[CLIENT]: " + m_Players[id.data]->GetName() + " left the server." << "\n";
-			m_Players.erase(id.data);
+			if (Player* player = findPlayer(id.data)) {
+				std::cout << "[CLIENT]: " + player->GetName() + " left the server." << "\n";
+				m_Players.erase(id.data);
+			}
 		} else if (type == PacketType::Chat) {
 			Packet<std::string> packet = Serializator::deserialize<std::string>(data, size);
 			if (packet.id == SERVER_ID) {
 				std::cout << packet.data << "\n";
-			} else {
-				std::cout << m_Players[packet.id]->GetName() + ": " + packet.data << "\n";
+			} else if (Player* player = findPlayer(packet.id)) {
+				std::cout << player->GetName() + ": " + packet.data << "\n";
 			}
 		} else if (type == PacketType::Move) {
 			Packet<sf::Vector2f> packet = Serializator::deserialize<sf::Vector2f>(data, size);
-			m_Players[packet.id]->SetPosition(packet.data);
+			if (Player* player = findPlayer(packet.id))
+				player->SetPosition(packet.data);
 		} else if (type == PacketType::CreateHome) {
 			Packet<Home> packet = Serializator::deserialize<Home>(data, size);
-			m_Players[packet.id]->AddBuilding(std::make_shared<Home>(packet.data));
+			if (Player* player = findPlayer(packet.id))
+				player->AddBuilding(std::make_shared<Home>(packet.data));
 		} else if (type == PacketType::CreateMine) {
 			Packet<Mine> packet = Serializator::deserialize<Mine>(data, size);
-			m_Players[packet.id]->AddBuilding(std::make_shared<Mine>(packet.data));
+			if (Player* player = findPlayer(packet.id))
+				player->AddBuilding(std::make_shared<Mine>(packet.data));
 		}
 	});
 }

@@ -37,6 +37,13 @@ void Server::update() {
 
 			case ENET_EVENT_TYPE_RECEIVE: {
 				PacketType type = Serializator::deserializePacketType(event.packet->data, event.packet->dataLength);
+				// Every packet except Join must come from a player that already joined.
+				auto sender = players.find(event.peer->incomingPeerID);
+				if (type != PacketType::Join && sender == players.end()) {
+					enet_packet_destroy(event.packet);
+					break;
+				}
+
 				if (type == PacketType::Join) {
 					for (const auto& [id, entity] : players) {
 						Packet<Player> packet = {PacketType::Join, id, *(entity)};
@@ -53,9 +60,12 @@ void Server::update() {
 					std::cout << "[SERVER]: " + player.data.GetName() + " joined the server." << "\n";
 				} else if (type == PacketType::Leave) {
 					Packet<uint16_t> id = Serializator::deserialize<uint16_t>(event.packet->data, event.packet->dataLength);
-					std::cout << "[SERVER]: " + players[id.data]->GetName() + " left the server." << "\n";
-					broadcastExcept(event.peer, event.packet->data, event.packet->dataLength);
-					players.erase(id.data);
+					auto leaving = players.find(id.data);
+					if (leaving != players.end()) {
+						std::cout << "[SERVER]: " + leaving->second->GetName() + " left the server." << "\n";
+						broadcastExcept(event.peer, event.packet->data, event.packet->dataLength);
+						players.erase(leaving);
+					}
 				} else if (type == PacketType::Chat) {
 					Packet<std::string> packet = Serializator::deserialize<std::string>(event.packet->data, event.packet->dataLength);
 					const std::string& message = packet.data;
@@ -93,20 +103,20 @@ void Server::update() {
 						}
 					}
 					else {
-						std::cout << players[event.peer->incomingPeerID]->GetName() + ": " + message << "\n";
+						std::cout << sender->second->GetName() + ": " + message << "\n";
 						broadcastExcept(event.peer, event.packet->data, event.packet->dataLength);
 					}
 				} else if (type == PacketType::Move) {
 					Packet<sf::Vector2f> packet = Serializator::deserialize<sf::Vector2f>(event.packet->data, event.packet->dataLength);
-					players[event.peer->incomingPeerID]->SetPosition(packet.data);
+					sender->second->SetPosition(packet.data);
 					broadcastExcept(event.peer, event.packet->data, event.packet->dataLength);
 				} else if (type == PacketType::CreateHome) {
 					Packet<Home> packet = Serializator::deserialize<Home>(event.packet->data, event.packet->dataLength);
-					players[event.peer->incomingPeerID]->AddBuilding(std::make_shared<Home>(packet.data));
+					sender->second->AddBuilding(std::make_shared<Home>(packet.data));
 					broadcastExcept(event.peer, event.packet->data, event.packet->dataLength);
 				} else if (type == PacketType::CreateMine) {
 					Packet<Mine> packet = Serializator::deserialize<Mine>(event.packet->data, event.packet->dataLength);
-					players[event.peer->incomingPeerID]->AddBuilding(std::make_shared<Mine>(packet.data));
+					sender->second->AddBuilding(std::make_shared<Mine>(packet.data));
 					broadcastExcept(event.peer, event.packet->data, event.packet->dataLength);
 				}
 				enet_packet_destroy(event.packet);
@@ -117,7 +127,9 @@ void Server::update() {
 			case ENET_EVENT_TYPE_DISCONNECT: {
 				std::cout << "[SERVER]: " + Networker::hostToIp(event.peer->address.host) + ":" + std::to_string(event.peer->address.port) + " disconnected." << "\n";
 				std::cout << "[SERVER]: Disconnected peer ID: " << event.peer->incomingPeerID << "\n";
-				players.erase(event.peer->incomingPeerID);
+				// Peers that never sent Join are unknown to the other clients.
+				if (players.erase(event.peer->incomingPeerID) == 0)
+					break;
 				Packet<uint16_t> packet = {PacketType::Leave, event.peer->incomingPeerID, event.peer->incomingPeerID};
 				size_t size;
 				void* buffer = Serializator::serialize(packet, size);
