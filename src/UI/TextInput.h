@@ -15,7 +15,7 @@ public:
 	std::string Get();
 
 private:
-	bool isMouseOn();
+	inline bool isMouseOn(int x, int y) const;
 
 private:
 	sf::RectangleShape m_Rect;

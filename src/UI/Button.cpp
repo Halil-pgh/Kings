@@ -30,15 +30,6 @@ void Button::OnUpdate(float deltaTime) {
 		m_Rect.setFillColor(sf::Color(100, 100, 100));
 		return;
 	}
-
-	if (isMouseOn()) {
-		if (m_Rect.getFillColor() == m_PressedColor)
-			return;
-
-		m_Rect.setFillColor(m_HighlightedColor);
-		return;
-	}
-	m_Rect.setFillColor(m_NormalColor);
 }
 
 void Button::OnDraw(sf::RenderWindow& window) {
@@ -52,7 +43,7 @@ bool Button::OnEvent(const sf::Event& event) {
 
 	switch (event.type) {
 		case sf::Event::MouseButtonPressed: {
-			if (event.mouseButton.button == sf::Mouse::Left && isMouseOn()) {
+			if (event.mouseButton.button == sf::Mouse::Left && isMouseOn(event.mouseButton.x, event.mouseButton.y)) {
 				m_Rect.setFillColor(m_PressedColor);
 				m_OnClick();
 				return true;
@@ -61,7 +52,7 @@ bool Button::OnEvent(const sf::Event& event) {
 		}
 		case sf::Event::MouseButtonReleased: {
 			if (event.mouseButton.button == sf::Mouse::Left) {
-				if (isMouseOn())
+				if (isMouseOn(event.mouseButton.x, event.mouseButton.y))
 					m_Rect.setFillColor(m_HighlightedColor);
 				else
 					m_Rect.setFillColor(m_NormalColor);
@@ -71,15 +62,25 @@ bool Button::OnEvent(const sf::Event& event) {
 		}
 		default:
 			return false;
+
+		case sf::Event::MouseMoved: {
+			// mouse logic
+			std::cout << isMouseOn(event.mouseMove.x, event.mouseMove.y) << std::endl;
+			if (isMouseOn(event.mouseButton.x, event.mouseButton.y)) {
+				std::cout << "MouseMoved" << std::endl;
+
+				if (m_Rect.getFillColor() == m_PressedColor)
+					return true;
+
+				m_Rect.setFillColor(m_HighlightedColor);
+				return true;
+			}
+			m_Rect.setFillColor(m_NormalColor);
+			return false;
+		}
 	}
 }
 
-bool Button::isMouseOn()
-{
-	const sf::WindowBase& windowBase = Application::Get()->GetWindowBase();
-
-	return (float)sf::Mouse::getPosition(windowBase).x > m_Rect.getPosition().x &&
-			(float)sf::Mouse::getPosition(windowBase).x < m_Rect.getPosition().x + m_Rect.getSize().x &&
-			(float)sf::Mouse::getPosition(windowBase).y > m_Rect.getPosition().y &&
-			(float)sf::Mouse::getPosition(windowBase).y < m_Rect.getPosition().y + m_Rect.getSize().y;
+bool Button::isMouseOn(int x, int y) const {
+	return m_Rect.getGlobalBounds().contains(static_cast<float>(x), static_cast<float>(y));
 }

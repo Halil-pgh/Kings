@@ -74,21 +74,17 @@ bool TextInput::OnEvent(const sf::Event& event) {
 		}
 	}
 	if (event.type == sf::Event::MouseButtonPressed) {
-		m_TakeInput = isMouseOn();
-		if (m_TakeInput)
-			return true;
+		if (event.mouseButton.button == sf::Mouse::Left) {
+			m_TakeInput = isMouseOn(event.mouseButton.x, event.mouseButton.y);
+			if (m_TakeInput)
+				return true;
+		}
 	}
 	return false;
 }
 
-bool TextInput::isMouseOn()
-{
-	const sf::WindowBase& windowBase = Application::Get()->GetWindowBase();
-
-	return (float)sf::Mouse::getPosition(windowBase).x > m_Rect.getPosition().x &&
-			(float)sf::Mouse::getPosition(windowBase).x < m_Rect.getPosition().x + m_Rect.getSize().x &&
-			(float)sf::Mouse::getPosition(windowBase).y > m_Rect.getPosition().y &&
-			(float)sf::Mouse::getPosition(windowBase).y < m_Rect.getPosition().y + m_Rect.getSize().y;
+bool TextInput::isMouseOn(int x, int y) const {
+	return m_Rect.getGlobalBounds().contains(static_cast<float>(x), static_cast<float>(y));
 }
 
 std::string TextInput::Get() {

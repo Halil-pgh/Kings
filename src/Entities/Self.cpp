@@ -46,10 +46,6 @@ void Self::OnUpdate(float deltaTime) {
 		m_Client->send(buffer, size);
 		free(buffer);
 	}
-	else if (m_Mode == Mode::Build) {
-		sf::Vector2f mousePos = Application::GetMousePosition(SceneManager::GetActiveScene()->GetLayer("Game")->GetView());
-		m_ProductionBuilding->SetPosition(mousePos);
-	}
 
 	// Updating money $$$
 	m_MoneyTime += deltaTime;
@@ -58,8 +54,6 @@ void Self::OnUpdate(float deltaTime) {
 		m_PlayerStats->SetMoney(m_Money);
 		m_MoneyTime = 0;
 	}
-
-	FollowMouse();
 
 	if (m_Client->isConnected()) {
 		m_Client->update();
@@ -100,7 +94,7 @@ bool Self::OnEvent(const sf::Event& event) {
 
 	switch (event.type) {
 		case sf::Event::KeyPressed: {
-			sf::Vector2f mousePos = Application::GetMousePosition(SceneManager::GetActiveScene()->GetLayer("Game")->GetView());
+			sf::Vector2f mousePos = sf::Vector2f(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y));
 			switch (event.key.code) {
 				case sf::Keyboard::Q: {
 					m_Mode = Mode::Build;
@@ -185,24 +179,30 @@ bool Self::OnEvent(const sf::Event& event) {
 				}
 			}
 		}
+		case sf::Event::MouseMoved: {
+			sf::Vector2f mousePos = sf::Vector2f(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y));
+			if (m_Mode == Mode::Walk) {
+				float xdiff = mousePos.x - m_Rect.getPosition().x;
+				float ydiff = mousePos.y - m_Rect.getPosition().y;
+				float radian = atan2f(ydiff, xdiff);
+				m_Rect.setRotation(radian * (180.0f / (float)std::numbers::pi));
+
+				auto line = (float) sqrt(pow(xdiff, 2) + pow(ydiff, 2));
+				float times = line / m_Speed;
+				if (times != 0.0f) {
+					m_Velocity.x = xdiff / times;
+					m_Velocity.y = ydiff / times;
+				}
+
+				return true;
+			}
+			if (m_Mode == Mode::Build) {
+				m_ProductionBuilding->SetPosition(mousePos);
+			}
+		}
 		default: {
 			return false;
 		}
-	}
-}
-
-void Self::FollowMouse() {
-	sf::Vector2f mousePos = Application::GetMousePosition(SceneManager::GetActiveScene()->GetLayer("Game")->GetView());
-	float xdiff = mousePos.x - m_Rect.getPosition().x;
-	float ydiff = mousePos.y - m_Rect.getPosition().y;
-	float radian = atan2f(ydiff, xdiff);
-	m_Rect.setRotation(radian * (180.0f / (float)std::numbers::pi));
-
-	auto line = (float)sqrt(pow(xdiff, 2) + pow(ydiff, 2));
-	float times = line / m_Speed;
-	if (times != 0.0f) {
-		m_Velocity.x = xdiff / times;
-		m_Velocity.y = ydiff / times;
 	}
 }
 

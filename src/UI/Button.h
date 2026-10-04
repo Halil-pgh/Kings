@@ -19,7 +19,7 @@ public:
 	bool OnEvent(const sf::Event& event) override;
 
 private:
-	bool isMouseOn();
+	inline bool isMouseOn(int x, int y) const;
 
 private:
 	sf::RectangleShape m_Rect;
