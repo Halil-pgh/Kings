@@ -26,6 +26,9 @@ public:
 	}
 
 protected:
+	void UpdateTextPosition();
+
+protected:
 	sf::RectangleShape m_Rect;
 	sf::Text m_Text;
 	std::string m_Name;

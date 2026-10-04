@@ -36,7 +36,6 @@ void Self::OnUpdate(float deltaTime) {
 	camera.setCenter((sf::Vector2f)sf::Vector2i(m_Rect.getPosition()));
 
 	if (m_Mode == Mode::Walk) {
-		m_Text.move(m_Velocity * deltaTime);
 		m_Rect.move(m_Velocity * deltaTime);
 
 		// Send position to server
@@ -69,6 +68,7 @@ void Self::OnDraw(sf::RenderWindow &window) {
 	window.clear(sf::Color(82, 115, 6));
 
 	window.draw(m_Rect);
+	UpdateTextPosition();
 	window.draw(m_Text);
 
 	for (const auto& [_, player] : m_Players) {

@@ -2,6 +2,7 @@
 #include "Random.h"
 
 std::mt19937_64 Random::m_RandomEngine;
+std::mutex Random::m_Mutex;
 
 void Random::Init() {
 	m_RandomEngine.seed(std::random_device()());

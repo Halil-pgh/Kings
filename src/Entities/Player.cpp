@@ -19,11 +19,11 @@ Player::Player()
 	m_Text.setFont(FontManager::GetFont("normal"));
 	m_Text.setString("None");
 	m_Text.setCharacterSize(18);
-	m_Text.setPosition(TEXT_POS_X, TEXT_POS_Y);
 	m_Text.setStyle(sf::Text::Regular);
 }
 
 void Player::OnDraw(sf::RenderWindow& window) {
+	UpdateTextPosition();
 	window.draw(m_Rect);
 	window.draw(m_Text);
 
@@ -39,10 +39,14 @@ bool Player::OnEvent(const sf::Event &event) {
 void Player::SetName(const std::string& name) {
 	m_Name = name;
 	m_Text.setString(name);
-	m_Text.setPosition(TEXT_POS_X, TEXT_POS_Y);
 }
 
 void Player::SetPosition(const sf::Vector2f &position) {
 	m_Rect.setPosition(position);
+}
+
+// Measuring the text reads and modifies the shared sf::Font, which is not thread safe.
+// The server thread creates and moves players too, so only do this while drawing (main thread).
+void Player::UpdateTextPosition() {
 	m_Text.setPosition(TEXT_POS_X, TEXT_POS_Y);
 }
