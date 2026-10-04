@@ -84,15 +84,10 @@ void Server::update() {
 							send(event.peer, buffer, _size);
 							free(buffer);
 						} else if (message == "/disconnect") {
-							std::string disconnectMessage = "[SERVER]: " + players[event.peer->incomingPeerID]->GetName() + " disconnected.";
+							std::string disconnectMessage = "[SERVER]: " + sender->second->GetName() + " disconnected.";
 							std::cout << disconnectMessage << "\n";
-							Packet<uint16_t> leavePacket = {PacketType::Leave, event.peer->incomingPeerID, event.peer->incomingPeerID};
-							size_t _size;
-							void* buffer = Serializator::serialize(leavePacket, _size);
-							broadcast(buffer, _size);
-							players.erase(event.peer->incomingPeerID);
+							// The DISCONNECT event removes the player and sends Leave to the others.
 							disconnect(event.peer);
-							free(buffer);
 						} else {
 							std::string errorMessage = "[SERVER]: Invalid command.";
 							Packet<std::string> errorPacket = {PacketType::Chat, SERVER_ID, errorMessage};
@@ -173,13 +168,6 @@ bool Server::someClientConnected() {
 }
 
 void Server::disconnect(ENetPeer *peer) {
+	// Don't wait for the DISCONNECT event here, update() handles it like any other disconnect.
 	enet_peer_disconnect(peer, 0);
-	ENetEvent event;
-	bool disconnected = false;
-	if (enet_host_service(host, &event, 3000) > 0 && event.type == ENET_EVENT_TYPE_DISCONNECT) {
-		disconnected = true;
-	}
-	if (!disconnected) {
-		enet_peer_reset(peer);
-	}
 }
