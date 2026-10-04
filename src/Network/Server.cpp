@@ -26,7 +26,8 @@ Server::~Server() {
 
 void Server::update() {
 	ENetEvent event;
-	while (enet_host_service(host, &event, 1000) > 0) {
+	// Check running on every event, clients send packets every frame so this loop may never run dry.
+	while (running && enet_host_service(host, &event, 100) > 0) {
 		switch (event.type) {
 			case ENET_EVENT_TYPE_CONNECT: {
 				std::cout << "[SERVER]: " + Networker::hostToIp(event.peer->address.host) + ":" + std::to_string(event.peer->address.port) + " connected." << "\n";

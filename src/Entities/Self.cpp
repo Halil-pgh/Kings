@@ -210,9 +210,10 @@ bool Self::OnEvent(const sf::Event& event) {
 
 void Self::BecomeServer(const std::string& serverName) {
 	m_Server = std::make_shared<Server>(Server::PORT);
-	m_ServerThread = std::thread([&]() {
-		while (m_Server && m_Server->isRunning()) {
-			m_Server->update();
+	// The thread holds its own reference, so the server can't be destroyed under it. Reset() stops and joins it.
+	m_ServerThread = std::thread([server = m_Server]() {
+		while (server->isRunning()) {
+			server->update();
 		}
 	});
 	BecomeClient();
@@ -307,8 +308,10 @@ void Self::Reset() {
 	m_Speed = 100;
 	m_Client->disconnect();
 	m_Client.reset();
-	m_Server.reset();
+	if (m_Server)
+		m_Server->stop();
 	if (m_ServerThread.joinable())
 		m_ServerThread.join();
+	m_Server.reset();
 	m_Mode = Mode::Walk;
 }

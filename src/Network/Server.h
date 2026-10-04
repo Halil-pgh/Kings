@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <enet/enet.h>
 
 #include "Entities/Player.h"
@@ -26,7 +27,7 @@ public:
 private:
 	ENetAddress address{};
 	ENetHost *host = nullptr;
-	bool running = true;
+	std::atomic<bool> running{true}; // Written by the main thread, read by the server thread
 
 	std::unordered_map<uint16_t, std::shared_ptr<Player>> players;
 };
