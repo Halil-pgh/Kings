@@ -41,8 +41,12 @@ void Client::update() {
 }
 
 void Client::send(const void *data, size_t size) {
+	if (!connected)
+		return;
+
 	ENetPacket* packet = enet_packet_create(data, size, ENET_PACKET_FLAG_RELIABLE); // Not sure if reliable is the best option.
-	enet_peer_send(server, 0, packet);
+	if (enet_peer_send(server, 0, packet) < 0)
+		enet_packet_destroy(packet);
 	enet_host_flush(client);
 }
 

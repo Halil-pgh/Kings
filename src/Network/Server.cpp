@@ -134,7 +134,8 @@ void Server::update() {
 
 void Server::send(ENetPeer *peer, const void *data, size_t size) {
 	ENetPacket *packet = enet_packet_create(data, size, ENET_PACKET_FLAG_RELIABLE);
-	enet_peer_send(peer, 0, packet);
+	if (enet_peer_send(peer, 0, packet) < 0)
+		enet_packet_destroy(packet);
 }
 
 void Server::broadcast(const void *data, size_t size) {
@@ -146,10 +147,13 @@ void Server::broadcastExcept(ENetPeer *peer, const void *data, size_t size) {
 	ENetPacket *packet = enet_packet_create(data, size, ENET_PACKET_FLAG_RELIABLE);
 	for (size_t i = 0; i < host->peerCount; i++) {
 		ENetPeer *currentPeer = &host->peers[i];
-		if (currentPeer != peer) {
+		if (currentPeer != peer && currentPeer->state == ENET_PEER_STATE_CONNECTED) {
 			enet_peer_send(currentPeer, 0, packet);
 		}
 	}
+	// Nobody took the packet (e.g. only the sender is connected), so ENet will never free it.
+	if (packet->referenceCount == 0)
+		enet_packet_destroy(packet);
 }
 
 bool Server::someClientConnected() {
