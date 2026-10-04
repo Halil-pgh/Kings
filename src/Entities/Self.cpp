@@ -138,7 +138,7 @@ bool Self::OnEvent(const sf::Event& event) {
 					if (m_Mode == Mode::Build) {
 						m_Mode = Mode::Walk;
 						if (!CheckBuildingsForProduction()) {
-							break;
+							return false;
 						}
 
 						std::shared_ptr<Building> newBuilding;
@@ -199,6 +199,7 @@ bool Self::OnEvent(const sf::Event& event) {
 			if (m_Mode == Mode::Build) {
 				m_ProductionBuilding->SetPosition(mousePos);
 			}
+			return false;
 		}
 		default: {
 			return false;
