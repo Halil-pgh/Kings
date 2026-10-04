@@ -87,9 +87,13 @@ void Client::connect(const char* host, uint16_t port) {
 }
 
 void Client::disconnect() {
+	// connect() was never called
+	if (server == nullptr)
+		return;
+
 	ENetEvent event;
 	enet_peer_disconnect(server, 0);
-	while (enet_host_service(client, &event, 100) > 0) {
+	while (connected && enet_host_service(client, &event, 100) > 0) {
 		switch (event.type) {
 			case ENET_EVENT_TYPE_RECEIVE:
 				enet_packet_destroy(event.packet);
@@ -108,7 +112,9 @@ void Client::disconnect() {
 				break;
 		}
 	}
-	if (!connected) {
+	// The server didn't acknowledge in time, drop the connection without waiting.
+	if (connected) {
 		enet_peer_reset(server);
+		connected = false;
 	}
 }
