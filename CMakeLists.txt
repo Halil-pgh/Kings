@@ -6,11 +6,20 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+set(BUILD_SHARED_LIBS OFF)
+set(TGUI_BACKEND SFML_GRAPHICS)
+
 include(FetchContent)
 FetchContent_Declare(SFML
         GIT_REPOSITORY https://github.com/SFML/SFML.git
         GIT_TAG 2.6.x)
 FetchContent_MakeAvailable(SFML)
+FetchContent_Declare(
+        TGUI
+        GIT_REPOSITORY https://github.com/texus/TGUI
+        GIT_TAG v1.4.0
+)
+FetchContent_MakeAvailable(TGUI)
 
 file(GLOB_RECURSE SRC_FILES
         src/*.cpp
@@ -29,6 +38,7 @@ target_link_libraries(Kings PRIVATE
         sfml-system
         sfml-audio
         sfml-network
+        TGUI::TGUI
 )
 
 target_precompile_headers(Kings PRIVATE src/pch.h)

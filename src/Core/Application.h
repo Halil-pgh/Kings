@@ -1,9 +1,10 @@
 #pragma once
 
 #include <UI/Button.h>
-#include "Scene.h"
 #include "Entities/Self.h"
 #include "UI/ServerList.h"
+#include <TGUI/TGUI.hpp>
+#include <TGUI/Backend/SFML-Graphics.hpp>
 
 class Application {
 public:
@@ -13,6 +14,7 @@ public:
 
 	static sf::Vector2f GetMousePosition(const sf::View& base);
 	inline const sf::WindowBase& GetWindowBase() const { return m_Window; }
+	inline const sf::RenderWindow& GetWindow() const { return m_Window; }
 	inline bool IsRunning() const { return m_Running; }
 	inline const sf::View& GetDefaultView() { return m_Window.getDefaultView(); }
 
@@ -34,6 +36,8 @@ private:
 	bool m_Running = true;
 	std::shared_ptr<Self> m_Self;
 	std::shared_ptr<ServerList> m_ServerList;
+
+	tgui::Gui m_GUI;
 
 	friend class Options;
 };

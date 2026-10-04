@@ -15,6 +15,9 @@ Application* Application::s_Instance = nullptr;
 
 Application::Application() {
 	m_Window.create(sf::VideoMode(1024, 640), "Game");
+	// TODO we might need to use tgui for every gui thing
+	// but not sure whether that is a good idea
+	m_GUI.setWindow(m_Window);
 	Random::Init();
 	SceneManager::Init();
 	Networker::initialize();
