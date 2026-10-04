@@ -66,7 +66,7 @@ bool Button::OnEvent(const sf::Event& event) {
 		case sf::Event::MouseMoved: {
 			// mouse logic
 			std::cout << isMouseOn(event.mouseMove.x, event.mouseMove.y) << std::endl;
-			if (isMouseOn(event.mouseButton.x, event.mouseButton.y)) {
+			if (isMouseOn(event.mouseMove.x, event.mouseMove.y)) {
 				std::cout << "MouseMoved" << std::endl;
 
 				if (m_Rect.getFillColor() == m_PressedColor)

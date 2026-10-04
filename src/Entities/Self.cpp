@@ -94,7 +94,7 @@ bool Self::OnEvent(const sf::Event& event) {
 
 	switch (event.type) {
 		case sf::Event::KeyPressed: {
-			sf::Vector2f mousePos = sf::Vector2f(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y));
+			sf::Vector2f mousePos = Application::GetMousePosition(SceneManager::GetActiveScene()->GetLayer("Game")->GetView());
 			switch (event.key.code) {
 				case sf::Keyboard::Q: {
 					m_Mode = Mode::Build;
@@ -180,7 +180,8 @@ bool Self::OnEvent(const sf::Event& event) {
 			}
 		}
 		case sf::Event::MouseMoved: {
-			sf::Vector2f mousePos = sf::Vector2f(static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y));
+			const sf::View& view = SceneManager::GetActiveScene()->GetLayer("Game")->GetView();
+			sf::Vector2f mousePos = Application::Get()->GetWindow().mapPixelToCoords({event.mouseMove.x, event.mouseMove.y}, view);
 			if (m_Mode == Mode::Walk) {
 				float xdiff = mousePos.x - m_Rect.getPosition().x;
 				float ydiff = mousePos.y - m_Rect.getPosition().y;
